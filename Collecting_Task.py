@@ -1,3 +1,4 @@
+from asyncio import current_task
 import pygame
 import random
 import time
@@ -21,18 +22,18 @@ screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 draw_on = False
 drowOn = False
 last_pos = (0, 0)
-color = (0, 255, 0)
+green = (0, 255, 0)
 white = (255, 255, 255)
 black = (0, 0, 0)
 blue = (0, 0, 255)
 radius = 10
 
-# 192+(1727-192)/3.0
-xl = 600  # (1727-192)/3.0
-xs = (width-xl)/2
-# 109+(971-109)/5
-yl = 400
-ys = height-yl - 100
+boundaries = 60
+screen_width, screen_height = pygame.display.get_surface().get_size()
+xl = screen_width-(boundaries*2)
+xs = boundaries
+yl = screen_height-(boundaries*2)-40
+ys = boundaries
 imgIndex = 0
 delim = ' '
 imageDir = 'Arabic/Image'
@@ -103,6 +104,13 @@ cwd = os.getcwd()
 Data_path = cwd+"/Arabic/Data_converted"
 letter_paths = os.listdir(Data_path)
 print(letter_paths)
+
+x_coordinates = []
+y_coordinates = []
+x_coordinates_list = []
+y_coordinates_list = []
+
+
 for file_name in letter_paths:
 
     with open(Data_path+'/'+file_name, 'r') as csvfile:
@@ -118,7 +126,8 @@ for file_name in letter_paths:
                 y.append(int(ys+50+(0.8*yl)*(float(row[1]))))
     lettersX.append(x)
     lettersY.append(y)
-#
+
+    #
 # for key in d:
 #	img = pygame.image.load(imageDir+'/'+key+'.png').convert()
 #	img = pygame.transform.rotozoom(img,0,4)
@@ -145,26 +154,34 @@ startMagnetVisualization = False
 
 
 def magnet_visualizer(x, y):
-    newPoint = pygame.draw.circle(screen, (255, 215, 0), (x, y), 10)
+    pygame.draw.circle(screen, (255, 215, 0), (x, y), 10)
+
+
+def moveCamel(x, y):
+    screen.blit(camel, (x, y))
+    pygame.display.update()
 
 
 clear = pygame.image.load('clear.png').convert()
 clear = pygame.transform.scale(clear, (50, 50))
 clear = pygame.transform.rotate(clear, 180)
 rectClear = clear.get_rect()
-rectClear.center = (50, 120)
+rectClear.center = (screen_width/2 + 75, screen_height-52)
 
 load = pygame.image.load('load.png').convert()
 load = pygame.transform.scale(load, (50, 50))
 load = pygame.transform.rotate(load, 180)
 rectLoad = load.get_rect()
-rectLoad.center = (50, 180)
+rectLoad.center = (screen_width/2, screen_height-52)
 
 startL = pygame.image.load('start.png').convert()
 startL = pygame.transform.scale(startL, (50, 50))
 startL = pygame.transform.rotate(startL, 180)
 rectStart = startL.get_rect()
-rectStart.center = (50, 240)
+rectStart.center = (screen_width/2 - 75, screen_height-52)
+
+camel = pygame.image.load('camel.png')
+camel = pygame.transform.scale(camel, (100, 100))
 
 closeL = pygame.image.load('exit.png').convert()
 closeL = pygame.transform.scale(closeL, (50, 50))
@@ -184,65 +201,79 @@ screen.blit(startL, rectStart)
 screen.blit(closeL, rectClose)
 screen.blit(ResetMs, rectResetMs)
 
-pygame.draw.circle(screen, color, (int(xs), int(ys)), radius)
+pygame.draw.circle(screen, green, (int(xs), int(ys)), radius)
 pygame.draw.circle(screen, blue, (int(xs+xl), int(ys+yl)), radius)
 
 x = []
 y = []
 
-# gSer.flush()
-# print(gSer.readline())
-# print(gSer.readline())
-# time.sleep(1)
-# gSer.write(str.encode('$X\n'))
-# #gSer.write(str.encode('M5\n'))
-# gSer.write(str.encode('M3 S100\n'))
-# gSer.write(str.encode('M3 S500\n'))
-# gSer.write(str.encode('$H\n'))
+goal_box_x_center = screen_width/2
+goal_box_y_center = screen_height/2
+goal_box_width = 500
+goal_box_height = 300
+goal_box_start_x = goal_box_x_center-(goal_box_width/2)
+goal_box_start_y = goal_box_y_center-(goal_box_height/2)
 
-# time.sleep(15)
-# gSer.write(str.encode('$X\n'))
-# gSer.write(str.encode('M3 S500\n'))
-# time.sleep(1)
-# gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
-# print(gSer.readline())
-# time.sleep(0.1)
-# #gSer.write(str.encode('G10 P1 L20 \n'))
-# gSer.write(str.encode('G21 X105  Y-65 F4000\n'))
-# print(gSer.readline())
-# time.sleep(0.1)
-# gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
-# print(gSer.readline())
-# time.sleep(2)
-# gSer.write(str.encode('$X\n'))
-# print(gSer.readline())
-# gSer.write(str.encode('M3 S1000\n'))
-# print(gSer.readline())
-# gSer.write(str.encode(' G21 X0 Y-95 F4000\n'))
-# print(gSer.readline())
-# gSer.write(str.encode('$X\n'))
-# gSer.write(str.encode(' G21 X143 Y-95 F4000\n'))
-# print(gSer.readline())
-# gSer.write(str.encode('$X\n'))
-# gSer.write(str.encode(' G21 X0 Y0 F4000\n'))
-# print(gSer.readline())
-# gSer.write(str.encode('$X\n'))
-# gSer.write(str.encode('M3 S1000\n'))
-# #gSer.write(str.encode(' G21 X20  Y-20 F4000\n'))
-# #gSer.write(str.encode(' \n'))
-# time.sleep(2)
-# #gSer.write(str.encode('M3 S10\n'))
-# #gSer.write(str.encode('G0 X0 Y0\n' ))
+
+class point:
+    def __init__(p, x, y):
+        p.x = x
+        p.y = y
+
+    def set_x(p, x):
+        p.x = x
+
+    def set_y(p, x):
+        p.y = y
+
+
+def generate_straight_line_coordinates(from_point, to_point, n):
+    global x_coordinates, y_coordinates
+    m = (to_point.y-from_point.y)/(to_point.x-from_point.x)
+    c = from_point.y - m*from_point.x
+    domain = from_point.x - to_point.x
+    x_step_size = abs(domain/n)
+    x_cord_new = []
+    y_cord_new = []
+    for i in range(n):
+        x_cord_new.append(from_point.x+x_step_size*i)
+        y_cord_new.append(m*(from_point.x+x_step_size*i)+c)
+    x_coordinates = x_cord_new
+    y_coordinates = y_cord_new
+    return x_cord_new, y_cord_new
+
+
+number_tasks = 4
+
+new_points = []
+
+xp = []
+yp = []
+
+generate_straight_line_coordinates(
+    point(500, 500), point(screen_width/2, screen_height/2), 50)
+
+startingPositions = [point(200, 200), point(
+    300, 300), point(200, 600)]
+
+number_tasks = len(startingPositions)
+current_task = 0
+for starter in startingPositions:
+    x_coordinates, y_coordinates = generate_straight_line_coordinates(
+        starter, point(screen_width/2, screen_height/2), 50)
+    x_coordinates_list.append(x_coordinates)
+    y_coordinates_list.append(y_coordinates)
 
 
 try:
     while True:
-        rect = pygame.draw.rect(screen, white, (xs, ys, xl, yl), 5)
+        rect = pygame.draw.rect(screen, (102, 255, 51), (xs, ys, xl, yl), 7)
+        goal = pygame.draw.rect(screen, (102, 51, 10), (goal_box_start_x,
+                                                        goal_box_start_y, goal_box_width, goal_box_height), 7)
         screen.blit(clear, rectClear)
         screen.blit(load, rectLoad)
         screen.blit(startL, rectStart)
-        # screen.blit(closeL,rectClose)
-        # screen.blit(ResetMs,rectResetMs)
+
         for e in pygame.event.get():
 
             # e = pygame.event.wait()
@@ -282,14 +313,16 @@ try:
                 pygame.display.flip()
                 time.sleep(0.05)
                 pygame.draw.rect(screen, black, rectStart, 5)
-                imgIndex = (imgIndex+1) % len(letter_paths)
-                # screen.blit(letterImg[imgIndex],rectImg)
+
                 pygame.draw.rect(screen, black, rectLoad, 5)
                 pygame.display.flip()
                 pygame.draw.rect(screen, black, (xs, ys, xl, yl))
-                rect = pygame.draw.rect(screen, white, (xs, ys, xl, yl), 5)
-                xp = copy.copy(lettersX[imgIndex])
-                yp = copy.copy(lettersY[imgIndex])
+                rect = pygame.draw.rect(
+                    screen, (102, 255, 51), (xs, ys, xl, yl), 7)
+                goal = pygame.draw.rect(screen, (102, 51, 10), (goal_box_start_x,
+                                                                goal_box_start_y, goal_box_width, goal_box_height), 7)
+                xp = copy.copy(x_coordinates_list[current_task])
+                yp = copy.copy(y_coordinates_list[current_task])
                 lengthOfarr = len(xp)
                 newPoint = pygame.draw.circle(
                     screen, white, (xp.pop(0), yp.pop(0)), 20)
@@ -301,36 +334,47 @@ try:
 # Start check
 
             if e.type == pygame.MOUSEBUTTONDOWN and rectStart.collidepoint(e.pos):
-                pygame.draw.rect(screen, white, rectStart, 5)
                 pygame.display.flip()
                 time.sleep(0.05)
                 pygame.draw.rect(screen, black, (xs, ys, xl, yl))
                 rect = pygame.draw.rect(screen, white, (xs, ys, xl, yl), 5)
-                xp = copy.copy(lettersX[imgIndex])
-                yp = copy.copy(lettersY[imgIndex])
-                lengthOfarr = len(xp)
-                newPoint = pygame.draw.circle(
-                    screen, (200, 0, 0), (xp.pop(0), yp.pop(0)), 10)
-                pygame.display.flip()
+                for current in range(number_tasks):
+                    print("hulu", current)
+                    xp.append(copy.copy(x_coordinates_list[current]))
+                    yp.append(copy.copy(y_coordinates_list[current]))
+                    new_points.append(pygame.draw.circle(
+                        screen, (200, 0, 0), (xp[current].pop(0), yp[current].pop(0)), 10))
+
+                    pygame.display.flip()
                 drowOn = True
+                #
                 # screen.fill(black)
+
+
 # Drawing check
 
             if e.type == pygame.MOUSEBUTTONDOWN and rect.collidepoint(e.pos) and drowOn:
-                color = (0, 255, 0)
-                # pygame.draw.circle(screen, color, e.pos, radius)
+
                 draw_on = True
                 if e.type == pygame.MOUSEBUTTONUP:
                     draw_on = False
-            if draw_on and e.type == pygame.MOUSEMOTION and rect.collidepoint(e.pos) and newPoint.collidepoint(e.pos):
+            anyPoint = False
+            current = 0
+            for new_point in new_points:
+                if new_point.collidepoint(e.pos):
+                    newPoint = new_point
+                    anyPoint = True
+                    break
+                current += 1
+
+            if draw_on and e.type == pygame.MOUSEMOTION and rect.collidepoint(e.pos) and newPoint.collidepoint(e.pos) and anyPoint:
                 # if draw_on and :
                 # pygame.draw.circle(screen, color, e.pos, radius)
                 # roundline(screen, color, e.pos, last_pos,  radius)
                 # last_pos = e.pos
-
-                if lengthOfarr-1 > 0:
+                if len(xp[current])-1 > 0:
                     flag = 1
-                    xp0, yp0 = (xp.pop(0), yp.pop(0))
+                    xp0, yp0 = (xp[current].pop(0), yp[current].pop(0))
                     magnet_visualizer(xp0, yp0)
                     pygame.display.update()
                     xc, yc = getCoords(xp0, yp0)
@@ -360,7 +404,10 @@ try:
                     # readlinL = serL.readline()
 
                     # print readlinL,readlinR
-                    newPoint = pygame.draw.circle(screen, blue, (xp0, yp0), 20)
+
+                    new_points[current] = pygame.draw.circle(
+                        screen, blue, (xp0, yp0), 20)
+
                     lengthOfarr -= 1
                     pygame.display.flip()
                     time.sleep(0.002)
@@ -372,7 +419,18 @@ try:
                     # time.sleep(0.02)
 
                 else:
-
+                    if number_tasks > (current_task+1):
+                        current_task += 1
+                        pygame.draw.rect(screen, black, (xs, ys, xl, yl))
+                        rect = pygame.draw.rect(
+                            screen, white, (xs, ys, xl, yl), 5)
+                        xp = copy.copy(x_coordinates_list[current_task])
+                        yp = copy.copy(y_coordinates_list[current_task])
+                        lengthOfarr = len(xp)
+                        newPoint = pygame.draw.circle(
+                            screen, (200, 0, 0), (xp.pop(0), yp.pop(0)), 10)
+                        pygame.display.flip()
+                        drowOn = True
                     # (thL,thR) = invKin(xin,yin)
                     # print thL,thR
                     # thL = -90+thL
