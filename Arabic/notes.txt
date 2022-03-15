@@ -1,0 +1,2 @@
+import glob
+letter_paths = glob.glob("D:\learning tool project\ltv2\Software\Arabic\Data\*.csv")
