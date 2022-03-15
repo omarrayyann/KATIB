@@ -152,9 +152,6 @@ startL = pygame.transform.rotate(startL, 180)
 rectStart = startL.get_rect()
 rectStart.center = (screen_width/2 - 75, screen_height-52)
 
-camel = pygame.image.load('camel.png')
-camel = pygame.transform.scale(camel, (100, 100))
-
 closeL = pygame.image.load('exit.png').convert()
 closeL = pygame.transform.scale(closeL, (50, 50))
 rectClose = closeL.get_rect()
