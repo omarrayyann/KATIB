@@ -50,8 +50,8 @@ flag = 1
 
 
 def invKin(x_in, y_in):
-    #x_in = 0.024+0.052*(1-(xs+xl-x_in)/xl)
-    #y_in = 0.1171+0.047*((ys+yl-y_in)/yl)
+    # x_in = 0.024+0.052*(1-(xs+xl-x_in)/xl)
+    # y_in = 0.1171+0.047*((ys+yl-y_in)/yl)
     R = math.sqrt(x_in**2+y_in**2)
     k = math.atan(y_in/x_in)
     phi = math.acos(R/0.2)
@@ -79,7 +79,7 @@ def getCoords(xn, yn):
     else:
         return
     fx = 143*xn
-    #fy= 0.00017125*yn+0.09431875
+    # fy= 0.00017125*yn+0.09431875
     fy = -95*yn
     return fx, fy
 
@@ -135,6 +135,17 @@ for file_name in letter_paths:
 #			y.append(int(ys+60+(yl-80)*(1-float(row[1]))))
 #		lettersX.append(x)
 #		lettersY.append(y)
+
+
+# Remote Work Magnet Visualization
+magnet = pygame.image.load('clear.png').convert()
+magnet = pygame.transform.scale(magnet, (30, 30))
+
+startMagnetVisualization = False
+
+
+def magnet_visualizer(x, y):
+    newPoint = pygame.draw.circle(screen, (255, 215, 0), (x, y), 10)
 
 
 clear = pygame.image.load('clear.png').convert()
@@ -223,6 +234,7 @@ y = []
 # #gSer.write(str.encode('M3 S10\n'))
 # #gSer.write(str.encode('G0 X0 Y0\n' ))
 
+
 try:
     while True:
         rect = pygame.draw.rect(screen, white, (xs, ys, xl, yl), 5)
@@ -233,7 +245,7 @@ try:
         # screen.blit(ResetMs,rectResetMs)
         for e in pygame.event.get():
 
-            #e = pygame.event.wait()
+            # e = pygame.event.wait()
             # keys=pygame.key.get_pressed()
             if e.type == pygame.QUIT:
                 raise StopIteration
@@ -264,6 +276,7 @@ try:
                 drowOn = False
                 screen.fill(black)
 # Load check
+
             if e.type == pygame.MOUSEBUTTONDOWN and rectLoad.collidepoint(e.pos):
                 pygame.draw.rect(screen, white, rectLoad, 5)
                 pygame.display.flip()
@@ -279,13 +292,14 @@ try:
                 yp = copy.copy(lettersY[imgIndex])
                 lengthOfarr = len(xp)
                 newPoint = pygame.draw.circle(
-                    screen, blue, (xp.pop(0), yp.pop(0)), 20)
+                    screen, white, (xp.pop(0), yp.pop(0)), 20)
                 flag = 1
                 drowOn = False
                 drow_on = False
 
                 # pygame.display.flip()
 # Start check
+
             if e.type == pygame.MOUSEBUTTONDOWN and rectStart.collidepoint(e.pos):
                 pygame.draw.rect(screen, white, rectStart, 5)
                 pygame.display.flip()
@@ -296,26 +310,29 @@ try:
                 yp = copy.copy(lettersY[imgIndex])
                 lengthOfarr = len(xp)
                 newPoint = pygame.draw.circle(
-                    screen, blue, (xp.pop(0), yp.pop(0)), 10)
+                    screen, (200, 0, 0), (xp.pop(0), yp.pop(0)), 10)
                 pygame.display.flip()
                 drowOn = True
                 # screen.fill(black)
 # Drawing check
+
             if e.type == pygame.MOUSEBUTTONDOWN and rect.collidepoint(e.pos) and drowOn:
                 color = (0, 255, 0)
-                #pygame.draw.circle(screen, color, e.pos, radius)
+                # pygame.draw.circle(screen, color, e.pos, radius)
                 draw_on = True
                 if e.type == pygame.MOUSEBUTTONUP:
                     draw_on = False
             if draw_on and e.type == pygame.MOUSEMOTION and rect.collidepoint(e.pos) and newPoint.collidepoint(e.pos):
                 # if draw_on and :
-                #pygame.draw.circle(screen, color, e.pos, radius)
-                #roundline(screen, color, e.pos, last_pos,  radius)
-                #last_pos = e.pos
+                # pygame.draw.circle(screen, color, e.pos, radius)
+                # roundline(screen, color, e.pos, last_pos,  radius)
+                # last_pos = e.pos
 
                 if lengthOfarr-1 > 0:
                     flag = 1
                     xp0, yp0 = (xp.pop(0), yp.pop(0))
+                    magnet_visualizer(xp0, yp0)
+                    pygame.display.update()
                     xc, yc = getCoords(xp0, yp0)
                     print("pixels x %f , y %f", (xp0, yp0))
                     print(xc, yc)
@@ -333,14 +350,14 @@ try:
                    # sting2send=str(thR)+'\n'
                     # serR.write(sting2send)
 
-                    #readlinR = serR.readline()
+                    # readlinR = serR.readline()
                     # time.sleep(0.002)
 
-                    #sting2send = str(thL)+'\n'
+                    # sting2send = str(thL)+'\n'
                     # serL.write(sting2send)
 
                     time.sleep(0.002)
-                    #readlinL = serL.readline()
+                    # readlinL = serL.readline()
 
                     # print readlinL,readlinR
                     newPoint = pygame.draw.circle(screen, blue, (xp0, yp0), 20)
@@ -356,10 +373,10 @@ try:
 
                 else:
 
-                    #(thL,thR) = invKin(xin,yin)
+                    # (thL,thR) = invKin(xin,yin)
                     # print thL,thR
-                    #thL = -90+thL
-                    #thR = 90+thR
+                    # thL = -90+thL
+                    # thR = 90+thR
                     gcodeString = "G21 X" + \
                         "0".format(xc)+" Y"+"0".format(yc)+" F4000\n"
                     if(flag == 1):
@@ -367,10 +384,10 @@ try:
                         # gSer.write(str.encode(gcodeString))
                         # sting2send=str(thR)+'\n'
                         # serR.write(sting2send)
-                        #readlinR = serR.readline()
-                        #sting2send = str(thL)+'\n'
+                        # readlinR = serR.readline()
+                        # sting2send = str(thL)+'\n'
                         # serL.write(sting2send)
-                        #readlinL = serL.readline()
+                        # readlinL = serL.readline()
 
                         # print readlinL,readlinR
                         draw_on = False
@@ -380,7 +397,6 @@ try:
                         flag = 0
                         time.sleep(0.02)
             pygame.display.flip()
-
 except StopIteration:
     pass
 string2send = str(0.0)+'\n'
