@@ -8,7 +8,6 @@ import copy
 import serial
 import math
 
-# test github commit
 # Electromagnet Setup
 force_pin = 18
 magnet1Pin = 23
