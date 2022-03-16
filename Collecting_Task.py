@@ -10,7 +10,6 @@ import copy
 import serial
 import math
 
-
 # Functions
 
 
@@ -115,7 +114,7 @@ class camel:
     def __init__(self, point):
         self.point = point
         self.collected = False
-        self.path_coordinates = generate_path_coordinates_parabola(point, 100)
+        self.path_coordinates = generate_path_coordinates(point, 100)
 
 
 # Electromagnet Setup
