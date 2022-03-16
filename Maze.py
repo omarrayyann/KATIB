@@ -21,6 +21,7 @@ class Maze:
         self.current = self.grid[0]
         self.stack.append(self.current)
         self.current.visited = True
+        self.drawn = False
 
     # Returns the 1-D index from the column and row indeces
     def index(self, i, j):
@@ -38,8 +39,8 @@ class Maze:
             for j in range(self.cols):
                 self.grid[self.index(i, j)].draw_cell(screen, line_color, x_start, y_start, self.w)
         self.highlight_current(screen, x_start, y_start)
-        if len(self.solution) != 0 and len(self.stack) == 0:
-            self.highlight_solution(screen, x_start, y_start)
+        #if len(self.solution) != 0 and len(self.stack) == 0:
+            #self.highlight_solution(screen, x_start, y_start)
 
     def highlight_current(self, screen, x_start, y_start):
         pygame.draw.rect(screen, (0, 0, 100), pygame.Rect(self.current.j * self.w + x_start + 2, self.current.i * self.w + y_start + 2, self.w - 4, self.w - 4))
@@ -66,3 +67,5 @@ class Maze:
         elif len(self.stack) != 0:
             self.current = self.stack[len(self.stack) - 2]
             self.stack.pop()
+        elif len(self.stack) == 0:
+            self.drawn = True

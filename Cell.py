@@ -25,8 +25,8 @@ class Cell:
         x = x_start + self.j * w
         y = y_start + self.i * w
         # Coloring in visited cells
-        if self.visited:
-            pygame.draw.rect(screen, (100, 0, 100), pygame.Rect(x, y, w, w))
+        #if self.visited:
+            # pygame.draw.rect(screen, (100, 0, 100), pygame.Rect(x, y, w, w))
 
         # Drawing the active walls
         # for k in range(4):
