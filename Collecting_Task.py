@@ -228,26 +228,26 @@ goal_box_start_y = goal_box_y_center-(goal_box_height/2)
 bg = pygame.image.load("bgg.jpg")
 # screen.blit(bg, (0, 0))
 
-camel_image = pygame.image.load("camel.png")
+camel_image = pygame.image.load("sheep.png")
 camel_image = pygame.transform.flip(camel_image, True, False)
-camel_image = pygame.transform.scale(camel_image, (150, 121.3))
+camel_image = pygame.transform.scale(camel_image, (100, 100))
 
 
 def update_camels():
-    screen.fill((181, 202, 71))
+    screen.fill((106, 164, 82))
     # screen.blit(bg, (0, 0))
     # screen.blit(clear, rectClear)
     # screen.blit(load, rectLoad)
     screen.blit(startL, rectStart)
-    rect = pygame.draw.rect(screen, (102, 255, 51), (xs, ys, xl, yl), 7)
+    rect = pygame.draw.rect(screen, (220, 182, 122), (xs, ys, xl, yl), 7)
     goal = pygame.draw.circle(screen, (204, 102, 20),
                               [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
     for camel in points:
-        pygame.draw.line(screen, (153, 204, 255), (camel[0].x,
-                                                   camel[0].y), (camel[len(camel)-1].x, camel[len(camel)-1].y), 20)
-        pygame.draw.circle(screen, (153, 204, 255),
-                           (camel[len(camel)-1].x, camel[len(camel)-1].y), 20)
-        screen.blit(camel_image, (camel[0].x - 75, camel[0].y - 60))
+        pygame.draw.line(screen, (49, 74, 54), (camel[0].x,
+                                                camel[0].y), (camel[len(camel)-1].x, camel[len(camel)-1].y), 15)
+        pygame.draw.circle(screen, (49, 74, 54),
+                           (camel[len(camel)-1].x, camel[len(camel)-1].y), 15)
+        screen.blit(camel_image, (camel[0].x - 50, camel[0].y - 50))
 
     pygame.display.flip()
 
@@ -260,10 +260,12 @@ try:
         magnet_visualizer()
         if not firstOpen:
             firstOpen = True
+            screen.fill((106, 164, 82))
             rect = pygame.draw.rect(
-                screen, (102, 255, 51), (xs, ys, xl, yl), 7)
+                screen, (220, 182, 122), (xs, ys, xl, yl), 7)
             goal = pygame.draw.circle(screen, (204, 102, 20),
                                       [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
+
         # screen.blit(clear, rectClear)
         # screen.blit(load, rectLoad)
         screen.blit(startL, rectStart)
