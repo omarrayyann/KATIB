@@ -1,4 +1,5 @@
 from asyncio import current_task
+from cmath import sqrt
 import pygame
 import random
 import time
@@ -12,12 +13,21 @@ import math
 
 # Functions
 
+
 def generate_path_coordinates(from_point, n):
-    to_point = point(screen_width/2, screen_height/2)
+    randomX = random.uniform(
+        screen_width/2 - screen_height/4.25, screen_width/2 + screen_height/4)
+
+    a = (((screen_height/4)**2 - (randomX-screen_width/2)**2))**0.5
+
+    randomY = random.uniform(-a, a)+screen_height/2
+
+    to_point = point(randomX, randomY)
+
     m = (to_point.y-from_point.y)/(to_point.x-from_point.x)
     c = from_point.y - m*from_point.x
-    domain = from_point.x - to_point.x
-    x_step_size = abs(domain/n)
+    domain = to_point.x - from_point.x
+    x_step_size = domain/n
     points = []
     for i in range(n):
         points.append(point(from_point.x+x_step_size*i,
@@ -82,7 +92,7 @@ class camel:
     def __init__(self, point):
         self.point = point
         self.collected = False
-        self.path_coordinates = generate_path_coordinates(point, 50)
+        self.path_coordinates = generate_path_coordinates(point, 100)
 
 
 # Electromagnet Setup
@@ -104,7 +114,7 @@ startMagnetVisualization = False
 
 
 def magnet_visualizer(x, y):
-    pygame.draw.circle(screen, (255, 215, 0), (x, y), 10)
+    pygame.draw.circle(screen, (255, 215, 0), (x, y), 5)
 
 
 # Other Configurtions Setup
@@ -120,8 +130,8 @@ ys = boundaries
 flag = 1
 new_points = []
 points = []
-camels = [camel(point(200, 200)), camel(point(300, 300))]
-
+camels = [camel(point(200, 200)), camel(point(1000, 700))]
+collected = 0
 
 # Serial Setup
 
@@ -172,12 +182,16 @@ goal_box_height = 300
 goal_box_start_x = goal_box_x_center-(goal_box_width/2)
 goal_box_start_y = goal_box_y_center-(goal_box_height/2)
 
+bg = pygame.image.load("grass2.jpg")
+screen.blit(bg, (0, 0))
 
 try:
     while True:
+        # INSIDE OF THE GAME LOOP
+
         rect = pygame.draw.rect(screen, (102, 255, 51), (xs, ys, xl, yl), 7)
-        goal = pygame.draw.rect(screen, (102, 51, 10), (goal_box_start_x,
-                                                        goal_box_start_y, goal_box_width, goal_box_height), 7)
+        goal = pygame.draw.circle(screen, (204, 102, 20),
+                                  [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
         screen.blit(clear, rectClear)
         screen.blit(load, rectLoad)
         screen.blit(startL, rectStart)
@@ -222,14 +236,19 @@ try:
             if e.type == pygame.MOUSEBUTTONDOWN and rectStart.collidepoint(e.pos):
                 pygame.display.flip()
                 time.sleep(0.05)
-                pygame.draw.rect(screen, black, (xs, ys, xl, yl))
+                # pygame.draw.rect(screen, black, (xs, ys, xl, yl))
                 rect = pygame.draw.rect(screen, white, (xs, ys, xl, yl), 5)
-
+                collected = 0
                 for camel in camels:
                     print("hulu", current)
 
                     points.append(camel.path_coordinates)
 
+                    pygame.draw.line(screen, (153, 204, 255), (camel.point.x,
+                                     camel.point.y), (camel.path_coordinates[len(camel.path_coordinates)-1].x, camel.path_coordinates[len(camel.path_coordinates)-1].y), 20)
+                    pygame.draw.circle(screen, (153, 204, 255), (camel.path_coordinates[len(
+                        camel.path_coordinates)-1].x, camel.path_coordinates[len(camel.path_coordinates)-1].y), 20)
+                    pygame.display.flip()
                     new_points.append(pygame.draw.circle(
                         screen, (200, 0, 0), (points[len(points)-1][0].x, points[len(points)-1][0].y), 10))
 
@@ -295,7 +314,7 @@ try:
                     # print readlinL,readlinR
 
                     new_points[current] = pygame.draw.circle(
-                        screen, blue, (xp0, yp0), 20)
+                        screen, blue, (xp0, yp0), 10)
 
                     pygame.display.flip()
                     time.sleep(0.002)
@@ -307,6 +326,7 @@ try:
                     # time.sleep(0.02)
 
                 else:
+                    collected += 1
                     # if len(camels) > (current_task+1):
                     #     current_task += 1
                     #     pygame.draw.rect(screen, black, (xs, ys, xl, yl))

@@ -234,6 +234,10 @@ y = []
 # #gSer.write(str.encode('M3 S10\n'))
 # #gSer.write(str.encode('G0 X0 Y0\n' ))
 
+bg = pygame.image.load("grass.png")
+
+#INSIDE OF THE GAME LOOP
+gameDisplay.blit(bg, (0, 0))
 
 try:
     while True:
