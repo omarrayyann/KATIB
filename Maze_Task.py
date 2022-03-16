@@ -25,13 +25,13 @@ color = (0, 255, 0)
 white = (255, 255, 255)
 black = (0, 0, 0)
 blue = (0, 0, 255)
-radius = 10
+radius = 30
 
 # 192+(1727-192)/3.0
-xl = 600  # (1727-192)/3.0
+xl = 1200  # (1727-192)/3.0
 xs = (width-xl)/2
 # 109+(971-109)/5
-yl = 400
+yl = 750
 ys = height-yl - 100
 imgIndex = 0
 delim = ' '
@@ -84,7 +84,7 @@ def getCoords(xn, yn):
     return fx, fy
 
 
-def roundline(srf, color, start, end, radius=10):
+def roundline(srf, color, start, end, radius):
     dx = end[0]-start[0]
     dy = end[1]-start[1]
     distance = max(abs(dx), abs(dy))
@@ -292,10 +292,10 @@ try:
                 yp = copy.copy(lettersY[imgIndex])
                 lengthOfarr = len(xp)
                 newPoint = pygame.draw.circle(
-                    screen, white, (xp.pop(0), yp.pop(0)), 20)
+                    screen, white, (xp.pop(0), yp.pop(0)), radius)
                 flag = 1
                 drowOn = False
-                drow_on = False
+                draw_on = False
 
                 # pygame.display.flip()
 # Start check
@@ -310,7 +310,7 @@ try:
                 yp = copy.copy(lettersY[imgIndex])
                 lengthOfarr = len(xp)
                 newPoint = pygame.draw.circle(
-                    screen, (200, 0, 0), (xp.pop(0), yp.pop(0)), 10)
+                    screen, (200, 0, 0), (xp.pop(0), yp.pop(0)), radius)
                 pygame.display.flip()
                 drowOn = True
                 # screen.fill(black)
@@ -360,7 +360,7 @@ try:
                     # readlinL = serL.readline()
 
                     # print readlinL,readlinR
-                    newPoint = pygame.draw.circle(screen, blue, (xp0, yp0), 20)
+                    newPoint = pygame.draw.circle(screen, blue, (xp0, yp0), radius)
                     lengthOfarr -= 1
                     pygame.display.flip()
                     time.sleep(0.002)
