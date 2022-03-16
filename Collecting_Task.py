@@ -16,7 +16,7 @@ import math
 
 def generate_path_coordinates(from_point, n):
     randomX = random.uniform(
-        screen_width/2 - screen_height/4.25, screen_width/2 + screen_height/4)
+        screen_width/2 - screen_height/4.5, screen_width/2 + screen_height/4)
 
     a = (((screen_height/4)**2 - (randomX-screen_width/2)**2))**0.5
 
@@ -32,6 +32,29 @@ def generate_path_coordinates(from_point, n):
     for i in range(n):
         points.append(point(from_point.x+x_step_size*i,
                       m*(from_point.x+x_step_size*i)+c))
+    return points
+
+
+def generate_path_coordinates_parabola(from_point, n):
+    randomX = random.uniform(
+        screen_width/2 - screen_height/4.5, screen_width/2 + screen_height/4)
+
+    a = (((screen_height/4)**2 - (randomX-screen_width/2)**2))**0.5
+
+    randomY = random.uniform(-a, a)+screen_height/2
+
+    to_point = point(randomX, randomY)
+
+    h = 1
+    a = (from_point.y-to_point.y)/((from_point.x-h)**2-(to_point.x-h)**2)
+    k = from_point.y - (from_point.x-h)**2
+
+    domain = to_point.x - from_point.x
+    x_step_size = domain/n
+    points = []
+    for i in range(n):
+        points.append(point(from_point.x+x_step_size*i,
+                      a*((from_point.x+x_step_size*i-h)**2)+k))
     return points
 
 
@@ -92,7 +115,7 @@ class camel:
     def __init__(self, point):
         self.point = point
         self.collected = False
-        self.path_coordinates = generate_path_coordinates(point, 100)
+        self.path_coordinates = generate_path_coordinates_parabola(point, 100)
 
 
 # Electromagnet Setup
@@ -144,30 +167,30 @@ collected = 0
 
 
 # Setting Up Images
-clear = pygame.image.load('clear.png').convert()
+clear = pygame.image.load('katib/clear.png').convert()
 clear = pygame.transform.scale(clear, (50, 50))
 clear = pygame.transform.rotate(clear, 180)
 rectClear = clear.get_rect()
 rectClear.center = (screen_width/2 + 75, screen_height-52)
 
-load = pygame.image.load('load.png').convert()
+load = pygame.image.load('katib/load.png').convert()
 load = pygame.transform.scale(load, (50, 50))
 load = pygame.transform.rotate(load, 180)
 rectLoad = load.get_rect()
 rectLoad.center = (screen_width/2, screen_height-52)
 
-startL = pygame.image.load('start.png').convert()
+startL = pygame.image.load('katib/start.png').convert()
 startL = pygame.transform.scale(startL, (50, 50))
 startL = pygame.transform.rotate(startL, 180)
 rectStart = startL.get_rect()
 rectStart.center = (screen_width/2 - 75, screen_height-52)
 
-closeL = pygame.image.load('exit.png').convert()
+closeL = pygame.image.load('katib/exit.png').convert()
 closeL = pygame.transform.scale(closeL, (50, 50))
 rectClose = closeL.get_rect()
 rectClose.center = (50, 100)
 
-ResetMs = pygame.image.load('exit.png').convert()
+ResetMs = pygame.image.load('katib/exit.png').convert()
 ResetMs = pygame.transform.scale(ResetMs, (50, 50))
 rectResetMs = ResetMs.get_rect()
 rectResetMs.center = (50, 200)
@@ -182,16 +205,44 @@ goal_box_height = 300
 goal_box_start_x = goal_box_x_center-(goal_box_width/2)
 goal_box_start_y = goal_box_y_center-(goal_box_height/2)
 
-bg = pygame.image.load("grass2.jpg")
-screen.blit(bg, (0, 0))
+# bg = pygame.image.load("katib/grass2.jpg")
+# screen.blit(bg, (0, 0))
+
+camel_image = pygame.image.load("katib/camel.png")
+camel_image = pygame.transform.flip(camel_image, True, False)
+camel_image = pygame.transform.scale(camel_image, (150, 121.3))
+
+
+def updateCamels():
+    screen.fill((0, 0, 0))
+    # screen.blit(bg, (0, 0))
+    screen.blit(clear, rectClear)
+    screen.blit(load, rectLoad)
+    screen.blit(startL, rectStart)
+    rect = pygame.draw.rect(screen, (102, 255, 51), (xs, ys, xl, yl), 7)
+    goal = pygame.draw.circle(screen, (204, 102, 20),
+                              [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
+    for camel in points:
+        pygame.draw.line(screen, (153, 204, 255), (camel[0].x,
+                                                   camel[0].y), (camel[len(camel)-1].x, camel[len(camel)-1].y), 20)
+        pygame.draw.circle(screen, (153, 204, 255),
+                           (camel[len(camel)-1].x, camel[len(camel)-1].y), 20)
+        screen.blit(camel_image, (camel[0].x - 75, camel[0].y - 60))
+
+    pygame.display.flip()
+
+
+firstOpen = False
 
 try:
     while True:
         # INSIDE OF THE GAME LOOP
-
-        rect = pygame.draw.rect(screen, (102, 255, 51), (xs, ys, xl, yl), 7)
-        goal = pygame.draw.circle(screen, (204, 102, 20),
-                                  [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
+        if not firstOpen:
+            firstOpen = True
+            rect = pygame.draw.rect(
+                screen, (102, 255, 51), (xs, ys, xl, yl), 7)
+            goal = pygame.draw.circle(screen, (204, 102, 20),
+                                      [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
         screen.blit(clear, rectClear)
         screen.blit(load, rectLoad)
         screen.blit(startL, rectStart)
@@ -244,13 +295,9 @@ try:
 
                     points.append(camel.path_coordinates)
 
-                    pygame.draw.line(screen, (153, 204, 255), (camel.point.x,
-                                     camel.point.y), (camel.path_coordinates[len(camel.path_coordinates)-1].x, camel.path_coordinates[len(camel.path_coordinates)-1].y), 20)
-                    pygame.draw.circle(screen, (153, 204, 255), (camel.path_coordinates[len(
-                        camel.path_coordinates)-1].x, camel.path_coordinates[len(camel.path_coordinates)-1].y), 20)
-                    pygame.display.flip()
                     new_points.append(pygame.draw.circle(
                         screen, (200, 0, 0), (points[len(points)-1][0].x, points[len(points)-1][0].y), 10))
+                    updateCamels()
 
                     points[len(points)-1].pop(0)
 
@@ -315,7 +362,7 @@ try:
 
                     new_points[current] = pygame.draw.circle(
                         screen, blue, (xp0, yp0), 10)
-
+                    updateCamels()
                     pygame.display.flip()
                     time.sleep(0.002)
                     # TURN ON MAGNET
