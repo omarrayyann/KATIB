@@ -1,3 +1,5 @@
+from asyncio import current_task
+from cmath import sqrt
 import pygame
 import random
 import time
@@ -8,45 +10,52 @@ import copy
 import serial
 import math
 
-# Electromagnet Setup
-force_pin = 18
-magnet1Pin = 23
-magnet2Pin = 24
 
-width = 1600
-height = 900
-# Screen Setup
-# screen = pygame.display.set_mode((width,height))
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-draw_on = False
-drowOn = False
-last_pos = (0, 0)
-color = (0, 255, 0)
-white = (255, 255, 255)
-black = (0, 0, 0)
-blue = (0, 0, 255)
-radius = 10
+# Functions
 
-# 192+(1727-192)/3.0
-xl = 600  # (1727-192)/3.0
-xs = (width-xl)/2
-# 109+(971-109)/5
-yl = 400
-ys = height-yl - 100
-imgIndex = 0
-delim = ' '
-imageDir = 'Arabic/Image'
-letterDir = 'Arabic/Data/'
-lengthOfarr = 0
-flag = 1
-# Serial Setup
 
-# gSer=serial.Serial('/dev/ttyACM0','115200')
-# time.sleep(3)
-# gSer.flush()
-# serL.write("r\n")
-# serR.write("r\n")
-# time.sleep(6.1)
+def generate_path_coordinates(from_point, n):
+    randomX = random.uniform(
+        screen_width/2 - screen_height/4.5, screen_width/2 + screen_height/4)
+
+    a = (((screen_height/4)**2 - (randomX-screen_width/2)**2))**0.5
+
+    randomY = random.uniform(-a, a)+screen_height/2
+
+    to_point = point(randomX, randomY)
+
+    m = (to_point.y-from_point.y)/(to_point.x-from_point.x)
+    c = from_point.y - m*from_point.x
+    domain = to_point.x - from_point.x
+    x_step_size = domain/n
+    points = []
+    for i in range(n):
+        points.append(point(from_point.x+x_step_size*i,
+                      m*(from_point.x+x_step_size*i)+c))
+    return points
+
+
+def generate_path_coordinates_parabola(from_point, n):
+    randomX = random.uniform(
+        screen_width/2 - screen_height/4.5, screen_width/2 + screen_height/4)
+
+    a = (((screen_height/4)**2 - (randomX-screen_width/2)**2))**0.5
+
+    randomY = random.uniform(-a, a)+screen_height/2
+
+    to_point = point(randomX, randomY)
+
+    h = 1
+    a = (from_point.y-to_point.y)/((from_point.x-h)**2-(to_point.x-h)**2)
+    k = from_point.y - (from_point.x-h)**2
+
+    domain = to_point.x - from_point.x
+    x_step_size = domain/n
+    points = []
+    for i in range(n):
+        points.append(point(from_point.x+x_step_size*i,
+                      a*((from_point.x+x_step_size*i-h)**2)+k))
+    return points
 
 
 def invKin(x_in, y_in):
@@ -94,155 +103,150 @@ def roundline(srf, color, start, end, radius=10):
         pygame.draw.circle(srf, color, (x, y), radius)
 
 
-d = dict.fromkeys(string.ascii_lowercase, [])
-letterImg = []
-lettersX = []
-lettersY = []
+# Classes
 
-cwd = os.getcwd()
-Data_path = cwd+"/Arabic/Data_converted"
-letter_paths = os.listdir(Data_path)
-print(letter_paths)
-for file_name in letter_paths:
+class point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
-    with open(Data_path+'/'+file_name, 'r') as csvfile:
-        coords = csv.reader(csvfile, delimiter=delim)
-        # print(coords)    		#header = next(plots)
-        x = []
-        y = []
-        l = []
-        for row in coords:
-            if len(row) > 1:
-                print(row, row[0], row[1])
-                x.append(int(xs+50+(0.7*xl)*(float(row[0]))))
-                y.append(int(ys+50+(0.8*yl)*(float(row[1]))))
-    lettersX.append(x)
-    lettersY.append(y)
-#
-# for key in d:
-#	img = pygame.image.load(imageDir+'/'+key+'.png').convert()
-#	img = pygame.transform.rotozoom(img,0,4)
-#	rectImg = img.get_rect()
-#	rectImg.center = (1450, 400)
-#	letterImg.append(img)
-#	with open(letterDir+key+'.csv','r') as csvfile:
-#		coords = csv.reader(csvfile, delimiter=delim)
-#		#header = next(plots)
-#		x=[]
-#		y=[]
-#		for row in coords:
-#			x.append(int(xs+60+(xl-80)*(1-float(row[0]))))
-#			y.append(int(ys+60+(yl-80)*(1-float(row[1]))))
-#		lettersX.append(x)
-#		lettersY.append(y)
 
+class camel:
+    def __init__(self, point):
+        self.point = point
+        self.collected = False
+        self.path_coordinates = generate_path_coordinates_parabola(point, 100)
+
+
+# Electromagnet Setup
+force_pin = 18
+magnet1Pin = 23
+magnet2Pin = 24
+
+# Screen Setup
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+
+# Colors Setup
+green = (0, 255, 0)
+white = (255, 255, 255)
+black = (0, 0, 0)
+blue = (0, 0, 255)
 
 # Remote Work Magnet Visualization
-magnet = pygame.image.load('clear.png').convert()
-magnet = pygame.transform.scale(magnet, (30, 30))
-
 startMagnetVisualization = False
 
 
 def magnet_visualizer(x, y):
-    newPoint = pygame.draw.circle(screen, (255, 215, 0), (x, y), 10)
+    pygame.draw.circle(screen, (255, 215, 0), (x, y), 5)
 
 
-clear = pygame.image.load('clear.png').convert()
+# Other Configurtions Setup
+draw_on = False
+drowOn = False
+radius = 10
+boundaries = 60
+screen_width, screen_height = pygame.display.get_surface().get_size()
+xl = screen_width-(boundaries*2)
+xs = boundaries
+yl = screen_height-(boundaries*2)-40
+ys = boundaries
+flag = 1
+new_points = []
+points = []
+camels = [camel(point(200, 200)), camel(point(1000, 700))]
+collected = 0
+
+# Serial Setup
+
+# gSer=serial.Serial('/dev/ttyACM0','115200')
+# time.sleep(3)
+# gSer.flush()
+# serL.write("r\n")
+# serR.write("r\n")
+# time.sleep(6.1)
+
+
+# Setting Up Images
+clear = pygame.image.load('katib/clear.png').convert()
 clear = pygame.transform.scale(clear, (50, 50))
 clear = pygame.transform.rotate(clear, 180)
 rectClear = clear.get_rect()
-rectClear.center = (50, 120)
+rectClear.center = (screen_width/2 + 75, screen_height-52)
 
-load = pygame.image.load('load.png').convert()
+load = pygame.image.load('katib/load.png').convert()
 load = pygame.transform.scale(load, (50, 50))
 load = pygame.transform.rotate(load, 180)
 rectLoad = load.get_rect()
-rectLoad.center = (50, 180)
+rectLoad.center = (screen_width/2, screen_height-52)
 
-startL = pygame.image.load('start.png').convert()
+startL = pygame.image.load('katib/start.png').convert()
 startL = pygame.transform.scale(startL, (50, 50))
 startL = pygame.transform.rotate(startL, 180)
 rectStart = startL.get_rect()
-rectStart.center = (50, 240)
+rectStart.center = (screen_width/2 - 75, screen_height-52)
 
-closeL = pygame.image.load('exit.png').convert()
+closeL = pygame.image.load('katib/exit.png').convert()
 closeL = pygame.transform.scale(closeL, (50, 50))
-# closeL=pygame.transform.rotate(closeL,180)
 rectClose = closeL.get_rect()
-rectClose.center = (width-50, 100)
+rectClose.center = (50, 100)
 
-ResetMs = pygame.image.load('exit.png').convert()
+ResetMs = pygame.image.load('katib/exit.png').convert()
 ResetMs = pygame.transform.scale(ResetMs, (50, 50))
-# closeL=pygame.transform.rotate(closeL,180)
 rectResetMs = ResetMs.get_rect()
-rectResetMs.center = (width-50, 200)
+rectResetMs.center = (50, 200)
 
-screen.blit(clear, rectClear)
-screen.blit(load, rectLoad)
-screen.blit(startL, rectStart)
-screen.blit(closeL, rectClose)
-screen.blit(ResetMs, rectResetMs)
-
-pygame.draw.circle(screen, color, (int(xs), int(ys)), radius)
+pygame.draw.circle(screen, green, (int(xs), int(ys)), radius)
 pygame.draw.circle(screen, blue, (int(xs+xl), int(ys+yl)), radius)
 
-x = []
-y = []
+goal_box_x_center = screen_width/2
+goal_box_y_center = screen_height/2
+goal_box_width = 500
+goal_box_height = 300
+goal_box_start_x = goal_box_x_center-(goal_box_width/2)
+goal_box_start_y = goal_box_y_center-(goal_box_height/2)
 
-# gSer.flush()
-# print(gSer.readline())
-# print(gSer.readline())
-# time.sleep(1)
-# gSer.write(str.encode('$X\n'))
-# #gSer.write(str.encode('M5\n'))
-# gSer.write(str.encode('M3 S100\n'))
-# gSer.write(str.encode('M3 S500\n'))
-# gSer.write(str.encode('$H\n'))
+# bg = pygame.image.load("katib/grass2.jpg")
+# screen.blit(bg, (0, 0))
 
-# time.sleep(15)
-# gSer.write(str.encode('$X\n'))
-# gSer.write(str.encode('M3 S500\n'))
-# time.sleep(1)
-# gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
-# print(gSer.readline())
-# time.sleep(0.1)
-# #gSer.write(str.encode('G10 P1 L20 \n'))
-# gSer.write(str.encode('G21 X105  Y-65 F4000\n'))
-# print(gSer.readline())
-# time.sleep(0.1)
-# gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
-# print(gSer.readline())
-# time.sleep(2)
-# gSer.write(str.encode('$X\n'))
-# print(gSer.readline())
-# gSer.write(str.encode('M3 S1000\n'))
-# print(gSer.readline())
-# gSer.write(str.encode(' G21 X0 Y-95 F4000\n'))
-# print(gSer.readline())
-# gSer.write(str.encode('$X\n'))
-# gSer.write(str.encode(' G21 X143 Y-95 F4000\n'))
-# print(gSer.readline())
-# gSer.write(str.encode('$X\n'))
-# gSer.write(str.encode(' G21 X0 Y0 F4000\n'))
-# print(gSer.readline())
-# gSer.write(str.encode('$X\n'))
-# gSer.write(str.encode('M3 S1000\n'))
-# #gSer.write(str.encode(' G21 X20  Y-20 F4000\n'))
-# #gSer.write(str.encode(' \n'))
-# time.sleep(2)
-# #gSer.write(str.encode('M3 S10\n'))
-# #gSer.write(str.encode('G0 X0 Y0\n' ))
+camel_image = pygame.image.load("katib/camel.png")
+camel_image = pygame.transform.flip(camel_image, True, False)
+camel_image = pygame.transform.scale(camel_image, (150, 121.3))
 
+
+def updateCamels():
+    screen.fill((0, 0, 0))
+    # screen.blit(bg, (0, 0))
+    screen.blit(clear, rectClear)
+    screen.blit(load, rectLoad)
+    screen.blit(startL, rectStart)
+    rect = pygame.draw.rect(screen, (102, 255, 51), (xs, ys, xl, yl), 7)
+    goal = pygame.draw.circle(screen, (204, 102, 20),
+                              [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
+    for camel in points:
+        pygame.draw.line(screen, (153, 204, 255), (camel[0].x,
+                                                   camel[0].y), (camel[len(camel)-1].x, camel[len(camel)-1].y), 20)
+        pygame.draw.circle(screen, (153, 204, 255),
+                           (camel[len(camel)-1].x, camel[len(camel)-1].y), 20)
+        screen.blit(camel_image, (camel[0].x - 75, camel[0].y - 60))
+
+    pygame.display.flip()
+
+
+firstOpen = False
 
 try:
     while True:
-        rect = pygame.draw.rect(screen, white, (xs, ys, xl, yl), 5)
+        # INSIDE OF THE GAME LOOP
+        if not firstOpen:
+            firstOpen = True
+            rect = pygame.draw.rect(
+                screen, (102, 255, 51), (xs, ys, xl, yl), 7)
+            goal = pygame.draw.circle(screen, (204, 102, 20),
+                                      [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
         screen.blit(clear, rectClear)
         screen.blit(load, rectLoad)
         screen.blit(startL, rectStart)
-        # screen.blit(closeL,rectClose)
-        # screen.blit(ResetMs,rectResetMs)
+
         for e in pygame.event.get():
 
             # e = pygame.event.wait()
@@ -266,7 +270,6 @@ try:
                 # serL.write("r\n")
                 time.sleep(3)
                 # serR.write("r\n")
-                # screen.fill(black)
 # Clear check
             if e.type == pygame.MOUSEBUTTONDOWN and rectClear.collidepoint(e.pos):
                 pygame.draw.rect(screen, white, rectClear, 5)
@@ -277,60 +280,56 @@ try:
                 screen.fill(black)
 # Load check
 
-            if e.type == pygame.MOUSEBUTTONDOWN and rectLoad.collidepoint(e.pos):
-                pygame.draw.rect(screen, white, rectLoad, 5)
-                pygame.display.flip()
-                time.sleep(0.05)
-                pygame.draw.rect(screen, black, rectStart, 5)
-                imgIndex = (imgIndex+1) % len(letter_paths)
-                # screen.blit(letterImg[imgIndex],rectImg)
-                pygame.draw.rect(screen, black, rectLoad, 5)
-                pygame.display.flip()
-                pygame.draw.rect(screen, black, (xs, ys, xl, yl))
-                rect = pygame.draw.rect(screen, white, (xs, ys, xl, yl), 5)
-                xp = copy.copy(lettersX[imgIndex])
-                yp = copy.copy(lettersY[imgIndex])
-                lengthOfarr = len(xp)
-                newPoint = pygame.draw.circle(
-                    screen, white, (xp.pop(0), yp.pop(0)), 20)
-                flag = 1
-                drowOn = False
-                drow_on = False
+    # no load for now
 
-                # pygame.display.flip()
 # Start check
 
             if e.type == pygame.MOUSEBUTTONDOWN and rectStart.collidepoint(e.pos):
-                pygame.draw.rect(screen, white, rectStart, 5)
                 pygame.display.flip()
                 time.sleep(0.05)
-                pygame.draw.rect(screen, black, (xs, ys, xl, yl))
+                # pygame.draw.rect(screen, black, (xs, ys, xl, yl))
                 rect = pygame.draw.rect(screen, white, (xs, ys, xl, yl), 5)
-                xp = copy.copy(lettersX[imgIndex])
-                yp = copy.copy(lettersY[imgIndex])
-                lengthOfarr = len(xp)
-                newPoint = pygame.draw.circle(
-                    screen, (200, 0, 0), (xp.pop(0), yp.pop(0)), 10)
-                pygame.display.flip()
+                collected = 0
+                for camel in camels:
+                    print("hulu", current)
+
+                    points.append(camel.path_coordinates)
+
+                    new_points.append(pygame.draw.circle(
+                        screen, (200, 0, 0), (points[len(points)-1][0].x, points[len(points)-1][0].y), 10))
+                    updateCamels()
+
+                    points[len(points)-1].pop(0)
+
+                    pygame.display.flip()
+
                 drowOn = True
+                #
                 # screen.fill(black)
+
+
 # Drawing check
 
             if e.type == pygame.MOUSEBUTTONDOWN and rect.collidepoint(e.pos) and drowOn:
-                color = (0, 255, 0)
-                # pygame.draw.circle(screen, color, e.pos, radius)
+
                 draw_on = True
                 if e.type == pygame.MOUSEBUTTONUP:
                     draw_on = False
-            if draw_on and e.type == pygame.MOUSEMOTION and rect.collidepoint(e.pos) and newPoint.collidepoint(e.pos):
-                # if draw_on and :
-                # pygame.draw.circle(screen, color, e.pos, radius)
-                # roundline(screen, color, e.pos, last_pos,  radius)
-                # last_pos = e.pos
+            anyPoint = False
+            current = 0
+            for new_point in new_points:
+                if new_point.collidepoint(e.pos):
+                    newPoint = new_point
+                    anyPoint = True
+                    break
+                current += 1
 
-                if lengthOfarr-1 > 0:
+            if draw_on and e.type == pygame.MOUSEMOTION and rect.collidepoint(e.pos) and anyPoint and newPoint.collidepoint(e.pos):
+
+                if len(points[current])-1 > 0:
                     flag = 1
-                    xp0, yp0 = (xp.pop(0), yp.pop(0))
+                    xp0, yp0 = (points[current][0].x, points[current][0].y)
+                    points[current].pop(0)
                     magnet_visualizer(xp0, yp0)
                     pygame.display.update()
                     xc, yc = getCoords(xp0, yp0)
@@ -360,8 +359,10 @@ try:
                     # readlinL = serL.readline()
 
                     # print readlinL,readlinR
-                    newPoint = pygame.draw.circle(screen, blue, (xp0, yp0), 20)
-                    lengthOfarr -= 1
+
+                    new_points[current] = pygame.draw.circle(
+                        screen, blue, (xp0, yp0), 10)
+                    updateCamels()
                     pygame.display.flip()
                     time.sleep(0.002)
                     # TURN ON MAGNET
@@ -372,11 +373,23 @@ try:
                     # time.sleep(0.02)
 
                 else:
-
-                    # (thL,thR) = invKin(xin,yin)
-                    # print thL,thR
-                    # thL = -90+thL
-                    # thR = 90+thR
+                    collected += 1
+                    # if len(camels) > (current_task+1):
+                    #     current_task += 1
+                    #     pygame.draw.rect(screen, black, (xs, ys, xl, yl))
+                    #     rect = pygame.draw.rect(
+                    #         screen, white, (xs, ys, xl, yl), 5)
+                    #     xp = copy.copy(x_coordinates_list[current_task])
+                    #     yp = copy.copy(y_coordinates_list[current_task])
+                    #     lengthOfarr = len(xp)
+                    #     newPoint = pygame.draw.circle(
+                    #         screen, (200, 0, 0), (xp.pop(0), yp.pop(0)), 10)
+                    #     pygame.display.flip()
+                    #     drowOn = True
+                    # # (thL,thR) = invKin(xin,yin)
+                    # # print thL,thR
+                    # # thL = -90+thL
+                    # # thR = 90+thR
                     gcodeString = "G21 X" + \
                         "0".format(xc)+" Y"+"0".format(yc)+" F4000\n"
                     if(flag == 1):
