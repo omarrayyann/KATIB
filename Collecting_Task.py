@@ -166,30 +166,30 @@ collected = 0
 
 
 # Setting Up Images
-clear = pygame.image.load('katib/clear.png').convert()
+clear = pygame.image.load('clear.png').convert()
 clear = pygame.transform.scale(clear, (50, 50))
 clear = pygame.transform.rotate(clear, 180)
 rectClear = clear.get_rect()
 rectClear.center = (screen_width/2 + 75, screen_height-52)
 
-load = pygame.image.load('katib/load.png').convert()
+load = pygame.image.load('load.png').convert()
 load = pygame.transform.scale(load, (50, 50))
 load = pygame.transform.rotate(load, 180)
 rectLoad = load.get_rect()
 rectLoad.center = (screen_width/2, screen_height-52)
 
-startL = pygame.image.load('katib/start.png').convert()
+startL = pygame.image.load('start.png').convert()
 startL = pygame.transform.scale(startL, (50, 50))
 startL = pygame.transform.rotate(startL, 180)
 rectStart = startL.get_rect()
 rectStart.center = (screen_width/2 - 75, screen_height-52)
 
-closeL = pygame.image.load('katib/exit.png').convert()
+closeL = pygame.image.load('exit.png').convert()
 closeL = pygame.transform.scale(closeL, (50, 50))
 rectClose = closeL.get_rect()
 rectClose.center = (50, 100)
 
-ResetMs = pygame.image.load('katib/exit.png').convert()
+ResetMs = pygame.image.load('exit.png').convert()
 ResetMs = pygame.transform.scale(ResetMs, (50, 50))
 rectResetMs = ResetMs.get_rect()
 rectResetMs.center = (50, 200)
@@ -207,7 +207,7 @@ goal_box_start_y = goal_box_y_center-(goal_box_height/2)
 # bg = pygame.image.load("katib/grass2.jpg")
 # screen.blit(bg, (0, 0))
 
-camel_image = pygame.image.load("katib/camel.png")
+camel_image = pygame.image.load("camel.png")
 camel_image = pygame.transform.flip(camel_image, True, False)
 camel_image = pygame.transform.scale(camel_image, (150, 121.3))
 

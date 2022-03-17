@@ -22,24 +22,22 @@ class Cell:
 
     # Draws the cell on the screen
     def draw_cell(self, screen, line_color, x_start, y_start, w):
+        lines = []
         x = x_start + self.j * w
         y = y_start + self.i * w
         # Coloring in visited cells
         #if self.visited:
             # pygame.draw.rect(screen, (100, 0, 100), pygame.Rect(x, y, w, w))
-
-        # Drawing the active walls
-        # for k in range(4):
-        #    if self.walls[k]:
-        #        pygame.draw.line(screen, line_color, (x + math.ceil(k/2) * w, y + math.floor(k/2) * w), (x + math.ceil(k/2 + 0.5) * w, y + math.floor(k/2 + 0.5) * w))
         if self.walls[0]:
-            pygame.draw.line(screen, line_color, (x, y), (x + w, y))
+            lines.append(pygame.draw.line(screen, line_color, (x, y), (x + w, y)))
         if self.walls[1]:
-            pygame.draw.line(screen, line_color, (x + w, y), (x + w, y + w))
+            lines.append(pygame.draw.line(screen, line_color, (x + w, y), (x + w, y + w)))
         if self.walls[2]:
-            pygame.draw.line(screen, line_color, (x + w, y + w), (x, y + w))
+            lines.append(pygame.draw.line(screen, line_color, (x + w, y + w), (x, y + w)))
         if self.walls[3]:
-            pygame.draw.line(screen, line_color, (x, y + w), (x, y))
+            lines.append(pygame.draw.line(screen, line_color, (x, y + w), (x, y)))
+        for line in lines:
+            pygame.display.update(line)
 
     def check_neighbors(self):
         neighbors = []
