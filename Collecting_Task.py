@@ -9,6 +9,9 @@ import csv
 import copy
 import serial
 import math
+# from scipy import interpolate
+# import numpy as np
+
 
 # Functions
 
@@ -30,7 +33,7 @@ def generate_path_coordinates(from_point, n):
     points = []
     for i in range(n):
         points.append(point(from_point.x+x_step_size*i,
-                      m*(from_point.x+x_step_size*i)+c))
+                            m*(from_point.x+x_step_size*i)+c))
     return points
 
 
@@ -44,16 +47,30 @@ def generate_path_coordinates_parabola(from_point, n):
 
     to_point = point(randomX, randomY)
 
-    h = 1
-    a = (from_point.y-to_point.y)/((from_point.x-h)**2-(to_point.x-h)**2)
-    k = from_point.y - (from_point.x-h)**2
+    between_point = point(500, 400)
 
+    x1 = from_point.x
+    x2 = between_point.x
+    x3 = to_point.x
+
+    y1 = from_point.y
+    y2 = between_point.y
+    y3 = to_point.y
+
+    C = (x1-x2) * (x1-x3) * (x2-x3)
+    A = (x3 * (y2-y1) + x2 * (y1-y3) + x1 * (y3-y2)) / C
+    B = (x3*x3 * (y1-y2) + x2*x2 * (y3-y1) + x1*x1 * (y2-y3)) / C
+    C = (x2 * x3 * (x2-x3) * y1+x3 * x1 *
+         (x3-x1) * y2+x1 * x2 * (x1-x2) * y3) / C
+
+    points = []
     domain = to_point.x - from_point.x
     x_step_size = domain/n
-    points = []
+
     for i in range(n):
-        points.append(point(from_point.x+x_step_size*i,
-                      a*((from_point.x+x_step_size*i-h)**2)+k))
+        x = from_point.x+x_step_size*i
+        y = A*(x**2)+B*(x)+C
+        points.append(point(x, y))
     return points
 
 
@@ -102,7 +119,12 @@ def roundline(srf, color, start, end, radius=10):
         pygame.draw.circle(srf, color, (x, y), radius)
 
 
+def magnet_visualizer():
+    pygame.draw.circle(screen, (255, 215, 0), (x_magnet, y_magnet), 10)
+    pygame.display.flip()
+
 # Classes
+
 
 class point:
     def __init__(self, x, y):
@@ -134,9 +156,8 @@ blue = (0, 0, 255)
 # Remote Work Magnet Visualization
 startMagnetVisualization = False
 
-
-def magnet_visualizer(x, y):
-    pygame.draw.circle(screen, (255, 215, 0), (x, y), 5)
+x_magnet = 0
+y_magnet = 0
 
 
 # Other Configurtions Setup
@@ -204,29 +225,29 @@ goal_box_height = 300
 goal_box_start_x = goal_box_x_center-(goal_box_width/2)
 goal_box_start_y = goal_box_y_center-(goal_box_height/2)
 
-# bg = pygame.image.load("katib/grass2.jpg")
+bg = pygame.image.load("bgg.jpg")
 # screen.blit(bg, (0, 0))
 
-camel_image = pygame.image.load("camel.png")
+camel_image = pygame.image.load("sheep.png")
 camel_image = pygame.transform.flip(camel_image, True, False)
-camel_image = pygame.transform.scale(camel_image, (150, 121.3))
+camel_image = pygame.transform.scale(camel_image, (100, 100))
 
 
-def updateCamels():
-    screen.fill((0, 0, 0))
+def update_camels():
+    screen.fill((106, 164, 82))
     # screen.blit(bg, (0, 0))
-    screen.blit(clear, rectClear)
-    screen.blit(load, rectLoad)
+    # screen.blit(clear, rectClear)
+    # screen.blit(load, rectLoad)
     screen.blit(startL, rectStart)
-    rect = pygame.draw.rect(screen, (102, 255, 51), (xs, ys, xl, yl), 7)
+    rect = pygame.draw.rect(screen, (220, 182, 122), (xs, ys, xl, yl), 7)
     goal = pygame.draw.circle(screen, (204, 102, 20),
                               [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
     for camel in points:
-        pygame.draw.line(screen, (153, 204, 255), (camel[0].x,
-                                                   camel[0].y), (camel[len(camel)-1].x, camel[len(camel)-1].y), 20)
-        pygame.draw.circle(screen, (153, 204, 255),
-                           (camel[len(camel)-1].x, camel[len(camel)-1].y), 20)
-        screen.blit(camel_image, (camel[0].x - 75, camel[0].y - 60))
+        pygame.draw.line(screen, (49, 74, 54), (camel[0].x,
+                                                camel[0].y), (camel[len(camel)-1].x, camel[len(camel)-1].y), 15)
+        pygame.draw.circle(screen, (49, 74, 54),
+                           (camel[len(camel)-1].x, camel[len(camel)-1].y), 15)
+        screen.blit(camel_image, (camel[0].x - 50, camel[0].y - 50))
 
     pygame.display.flip()
 
@@ -236,14 +257,17 @@ firstOpen = False
 try:
     while True:
         # INSIDE OF THE GAME LOOP
+        magnet_visualizer()
         if not firstOpen:
             firstOpen = True
+            screen.fill((106, 164, 82))
             rect = pygame.draw.rect(
-                screen, (102, 255, 51), (xs, ys, xl, yl), 7)
+                screen, (220, 182, 122), (xs, ys, xl, yl), 7)
             goal = pygame.draw.circle(screen, (204, 102, 20),
                                       [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
-        screen.blit(clear, rectClear)
-        screen.blit(load, rectLoad)
+
+        # screen.blit(clear, rectClear)
+        # screen.blit(load, rectLoad)
         screen.blit(startL, rectStart)
 
         for e in pygame.event.get():
@@ -295,8 +319,8 @@ try:
                     points.append(camel.path_coordinates)
 
                     new_points.append(pygame.draw.circle(
-                        screen, (200, 0, 0), (points[len(points)-1][0].x, points[len(points)-1][0].y), 10))
-                    updateCamels()
+                        screen, (200, 0, 0), (points[len(points)-1][0].x, points[len(points)-1][0].y), 20))
+                    update_camels()
 
                     points[len(points)-1].pop(0)
 
@@ -329,7 +353,8 @@ try:
                     flag = 1
                     xp0, yp0 = (points[current][0].x, points[current][0].y)
                     points[current].pop(0)
-                    magnet_visualizer(xp0, yp0)
+                    x_magnet = xp0
+                    y_magnet = yp0
                     pygame.display.update()
                     xc, yc = getCoords(xp0, yp0)
                     print("pixels x %f , y %f", (xp0, yp0))
@@ -361,7 +386,7 @@ try:
 
                     new_points[current] = pygame.draw.circle(
                         screen, blue, (xp0, yp0), 10)
-                    updateCamels()
+                    update_camels()
                     pygame.display.flip()
                     time.sleep(0.002)
                     # TURN ON MAGNET
@@ -391,6 +416,8 @@ try:
                     # # thR = 90+thR
                     gcodeString = "G21 X" + \
                         "0".format(xc)+" Y"+"0".format(yc)+" F4000\n"
+                    x_magnet = xc
+                    y_magnet = yc
                     if(flag == 1):
                         #################SEND GCODE END COMMAND######################
                         # gSer.write(str.encode(gcodeString))
