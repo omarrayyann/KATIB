@@ -85,10 +85,16 @@ try:
         else:
             buttons[3].text = 'Show Solution'
         if current != -1:
+            mazes[current].draw_maze(screen, (255, 255, 255), start_pos[0], start_pos[1], show)
             if not mazes[current].drawn:
                 mazes[current].move(start_pos[0], start_pos[1])
-            mazes[current].draw_maze(screen, (255, 255, 255), start_pos[0], start_pos[1], show)
-            draw_areas[current].draw_canvas(screen, (255, 255, 255), 10)
+            elif not mazes[current].saved:
+                mazes[current].saved = True
+                maze_area = screen.subsurface(draw_areas[current].canvas)
+                maze_area = maze_area.copy()
+                maze_area.unlock()
+                mazes[current].maze_image = maze_area
+            draw_areas[current].draw_canvas(screen, (200, 0, 200), 10)
         for button in buttons:
             button.draw_button(screen)
 

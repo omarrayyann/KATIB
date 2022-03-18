@@ -1,7 +1,13 @@
 import pygame
+import math
+
+
+def dist(point1, point2):
+    return math.sqrt(math.pow(point1[0] - point2[0], 2) + math.pow(point1[1] - point2[1], 2))
 
 
 class DrawArea:
+    min_distance = 20
 
     def __init__(self, width, height, top_left, color):
         self.width = width
@@ -22,15 +28,14 @@ class DrawArea:
                 if b == i - 1:
                     is_a_break = True
             if not is_a_break:
-                pygame.draw.line(screen, pen_color, self.points[i-1], self.points[i], pen_size)
+                pygame.draw.line(screen, pen_color, self.points[i - 1], self.points[i], pen_size)
             else:
-                pygame.draw.circle(screen, pen_color, self.points[i], pen_size/2)
+                pygame.draw.circle(screen, pen_color, self.points[i], pen_size / 2)
 
     def interact(self, event):
-        if self.drawing:
+        if self.drawing and (len(self.points) == 0 or dist(self.points[len(self.points) - 1], event.pos) > DrawArea.min_distance):
             self.points.append(event.pos)
 
     def clear_area(self):
         self.points = []
         self.breaks = []
-
