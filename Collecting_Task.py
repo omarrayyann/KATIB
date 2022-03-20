@@ -9,14 +9,13 @@ import csv
 import copy
 import serial
 import math
-# from scipy import interpolate
-# import numpy as np
+from scipy import interpolate
+import numpy as np
 
 
 # Functions
 
-
-def generate_path_coordinates(from_point, n):
+def generate_path_coordinates(from_point):
     randomX = random.uniform(
         screen_width/2 - screen_height/4.5, screen_width/2 + screen_height/4)
 
@@ -24,11 +23,14 @@ def generate_path_coordinates(from_point, n):
 
     randomY = random.uniform(-a, a)+screen_height/2
 
-    to_point = point(randomX, randomY)
+    to_point = point(screen_width/2, screen_height/2)
 
     m = (to_point.y-from_point.y)/(to_point.x-from_point.x)
     c = from_point.y - m*from_point.x
     domain = to_point.x - from_point.x
+    distance = ((((to_point.x - from_point.x)**2) +
+                ((to_point.y-from_point.y)**2))**0.5)
+    n = int(distance/7.5)
     x_step_size = domain/n
     points = []
     for i in range(n):
@@ -37,7 +39,13 @@ def generate_path_coordinates(from_point, n):
     return points
 
 
-def generate_path_coordinates_parabola(from_point, n):
+def line_draw(points):
+    for v in range(len(points)-1):
+        pygame.draw.line(screen, (100, 74, 54, 0.5),
+                         (points[v].x, points[v].y),  (points[v+1].x, points[v+1].y), 8)
+
+
+def generate_path_coordinates_parabola(from_point):
     randomX = random.uniform(
         screen_width/2 - screen_height/4.5, screen_width/2 + screen_height/4)
 
@@ -45,9 +53,9 @@ def generate_path_coordinates_parabola(from_point, n):
 
     randomY = random.uniform(-a, a)+screen_height/2
 
-    to_point = point(randomX, randomY)
+    to_point = point(995, 177)
 
-    between_point = point(500, 400)
+    between_point = point(912, 362)
 
     x1 = from_point.x
     x2 = between_point.x
@@ -64,7 +72,11 @@ def generate_path_coordinates_parabola(from_point, n):
          (x3-x1) * y2+x1 * x2 * (x1-x2) * y3) / C
 
     points = []
+
     domain = to_point.x - from_point.x
+    distance = ((((to_point.x - from_point.x)**2) +
+                ((to_point.y-from_point.y)**2))**0.5)
+    n = int(distance/7.5)
     x_step_size = domain/n
 
     for i in range(n):
@@ -136,7 +148,8 @@ class camel:
     def __init__(self, point):
         self.point = point
         self.collected = False
-        self.path_coordinates = generate_path_coordinates(point, 100)
+        self.path_coordinates = generate_path_coordinates_parabola(point)
+        self.drawn_point = point
 
 
 # Electromagnet Setup
@@ -168,13 +181,36 @@ boundaries = 60
 screen_width, screen_height = pygame.display.get_surface().get_size()
 xl = screen_width-(boundaries*2)
 xs = boundaries
-yl = screen_height-(boundaries*2)-40
+yl = screen_height-(boundaries*2)
 ys = boundaries
 flag = 1
 new_points = []
 points = []
-camels = [camel(point(200, 200)), camel(point(1000, 700))]
+camels = []
 collected = 0
+sheep_size = 100
+
+# def camelGenerator(n):
+#     angle_step_size = 2*math.pi/n
+#     opp = xl/2
+#     adj = yl/2
+#     sep_angle = math.tan(opp/adj)
+#     for i in range(n):
+#         current_angle = random.uniform(angle_step_size*i, angle_step_size*(i+1))
+#         factor = 1
+#         if current_angle>math.pi:
+#             current_angle = 2*math.pi - current_angle
+#             factor = -1
+#         else:
+#             factor = 1
+#         if current_angle<sep_angle:
+#             y_random = random.uniform(boundaries, screen_height/2)
+#             y_length = y_random - screen_height
+
+#             x_randomt = random.uniform(screen_width/2, )
+
+#     random_y = random.uniform(screen_height/2, )
+
 
 # Serial Setup
 
@@ -184,7 +220,6 @@ collected = 0
 # serL.write("r\n")
 # serR.write("r\n")
 # time.sleep(6.1)
-
 
 # Setting Up Images
 clear = pygame.image.load('clear.png').convert()
@@ -225,31 +260,59 @@ goal_box_height = 300
 goal_box_start_x = goal_box_x_center-(goal_box_width/2)
 goal_box_start_y = goal_box_y_center-(goal_box_height/2)
 
-bg = pygame.image.load("bgg.jpg")
+bg = pygame.image.load("bbg.jpg")
 # screen.blit(bg, (0, 0))
 
 camel_image = pygame.image.load("sheep.png")
 camel_image = pygame.transform.flip(camel_image, True, False)
-camel_image = pygame.transform.scale(camel_image, (100, 100))
+camel_image = pygame.transform.scale(camel_image, (sheep_size, sheep_size))
+
+fence_image = pygame.image.load("fencee.png")
+fence_image = pygame.transform.flip(fence_image, True, False)
+fence_image = pygame.transform.scale(fence_image, (540, 397.5))
 
 
 def update_camels():
     screen.fill((106, 164, 82))
-    # screen.blit(bg, (0, 0))
-    # screen.blit(clear, rectClear)
-    # screen.blit(load, rectLoad)
+    screen.blit(bg, (0, 0))
+    screen.blit(fence_image, (screen_width-560, 20))
     screen.blit(startL, rectStart)
     rect = pygame.draw.rect(screen, (220, 182, 122), (xs, ys, xl, yl), 7)
-    goal = pygame.draw.circle(screen, (204, 102, 20),
-                              [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
-    for camel in points:
-        pygame.draw.line(screen, (49, 74, 54), (camel[0].x,
-                                                camel[0].y), (camel[len(camel)-1].x, camel[len(camel)-1].y), 15)
-        pygame.draw.circle(screen, (49, 74, 54),
-                           (camel[len(camel)-1].x, camel[len(camel)-1].y), 15)
-        screen.blit(camel_image, (camel[0].x - 50, camel[0].y - 50))
-
+    pygame.draw.circle(screen, (204, 102, 20),
+                       [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
+    for camel in camels:
+        if camel.drawn_point is not camel.point:
+            # pygame.draw.line(screen, (100, 74, 54, 0.5), (camel.point.x,
+            #                                               camel.point.y), (camel.path_coordinates[len(camel.path_coordinates)-1].x, camel.path_coordinates[len(camel.path_coordinates)-1].y), 8)
+            line_draw(camel.path_coordinates)
+            pygame.draw.circle(screen, (100, 74, 54, 0.5),
+                               (camel.path_coordinates[len(camel.path_coordinates)-1].x, camel.path_coordinates[len(camel.path_coordinates)-1].y), 12)
+            camel.drawn_point = camel.point
+        screen.blit(camel_image, (camel.point.x - 50,
+                                  camel.point.y - 50))
     pygame.display.flip()
+
+
+# def randomizingCamels(n):
+#     global camels
+#     generated = 0
+#     while generated < n:
+#         random_x = random.uniform(boundaries, screen_width-boundaries)
+
+#         random_y = random.uniform(boundaries, screen_height-boundaries)
+#         if (random_x**2 + random_y**2) > (screen_height/4)**2:
+#             found = False
+#             a = (((screen_height-boundaries*2) *
+#                  (screen_width-boundaries*2))**0.5)*0.5
+#             for current_camel in camels:
+#                 if abs(current_camel.point.x-random_x) < a and abs(current_camel.point.y-random_y) < a:
+#                     found = True
+#             if found == False:
+#                 camels.append(camel(point(random_x, random_y)))
+#                 generated += 1
+
+camels = [camel(point(200, 200)), camel(
+    point(1000, 600)), camel(point(200, 600))]
 
 
 firstOpen = False
@@ -260,11 +323,12 @@ try:
         magnet_visualizer()
         if not firstOpen:
             firstOpen = True
+            # randomizingCamels(4)
             screen.fill((106, 164, 82))
             rect = pygame.draw.rect(
                 screen, (220, 182, 122), (xs, ys, xl, yl), 7)
-            goal = pygame.draw.circle(screen, (204, 102, 20),
-                                      [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
+            pygame.draw.circle(screen, (204, 102, 20),
+                               [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
 
         # screen.blit(clear, rectClear)
         # screen.blit(load, rectLoad)
@@ -314,15 +378,12 @@ try:
                 rect = pygame.draw.rect(screen, white, (xs, ys, xl, yl), 5)
                 collected = 0
                 for camel in camels:
-                    print("hulu", current)
-
-                    points.append(camel.path_coordinates)
 
                     new_points.append(pygame.draw.circle(
-                        screen, (200, 0, 0), (points[len(points)-1][0].x, points[len(points)-1][0].y), 20))
-                    update_camels()
+                        screen, (200, 0, 0), (camel.path_coordinates[0].x, camel.path_coordinates[0].y), 20))
 
-                    points[len(points)-1].pop(0)
+                    # points[len(points)-1].pop(0)
+                    update_camels()
 
                     pygame.display.flip()
 
@@ -349,10 +410,12 @@ try:
 
             if draw_on and e.type == pygame.MOUSEMOTION and rect.collidepoint(e.pos) and anyPoint and newPoint.collidepoint(e.pos):
 
-                if len(points[current])-1 > 0:
+                if len(camels[current].path_coordinates)-1 > 0:
                     flag = 1
-                    xp0, yp0 = (points[current][0].x, points[current][0].y)
-                    points[current].pop(0)
+                    xp0, yp0 = (camels[current].path_coordinates[0].x,
+                                camels[current].path_coordinates[0].y)
+                    camels[current].path_coordinates.pop(0)
+                    camels[current].point = camels[current].path_coordinates[0]
                     x_magnet = xp0
                     y_magnet = yp0
                     pygame.display.update()
@@ -385,7 +448,7 @@ try:
                     # print readlinL,readlinR
 
                     new_points[current] = pygame.draw.circle(
-                        screen, blue, (xp0, yp0), 10)
+                        screen, (blue), (xp0, yp0), 30)
                     update_camels()
                     pygame.display.flip()
                     time.sleep(0.002)
