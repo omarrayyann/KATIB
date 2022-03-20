@@ -9,8 +9,6 @@ import csv
 import copy
 import serial
 import math
-from scipy import interpolate
-import numpy as np
 
 
 # Functions
@@ -30,7 +28,7 @@ def generate_path_coordinates(from_point):
     domain = to_point.x - from_point.x
     distance = ((((to_point.x - from_point.x)**2) +
                 ((to_point.y-from_point.y)**2))**0.5)
-    n = int(distance/7.5)
+    n = int(distance/6)
     x_step_size = domain/n
     points = []
     for i in range(n):
@@ -53,9 +51,9 @@ def generate_path_coordinates_parabola(from_point):
 
     randomY = random.uniform(-a, a)+screen_height/2
 
-    to_point = point(995, 177)
+    to_point = point(1302, 168)
 
-    between_point = point(912, 362)
+    between_point = point(1230, 357)
 
     x1 = from_point.x
     x2 = between_point.x
@@ -76,7 +74,7 @@ def generate_path_coordinates_parabola(from_point):
     domain = to_point.x - from_point.x
     distance = ((((to_point.x - from_point.x)**2) +
                 ((to_point.y-from_point.y)**2))**0.5)
-    n = int(distance/7.5)
+    n = int(distance/4)
     x_step_size = domain/n
 
     for i in range(n):
@@ -115,9 +113,9 @@ def getCoords(xn, yn):
         yn = (yn-ys)/yl
     else:
         return
-    fx = 143*xn
+    fx = 305*xn
     # fy= 0.00017125*yn+0.09431875
-    fy = -95*yn
+    fy = -140*yn
     return fx, fy
 
 
@@ -177,12 +175,13 @@ y_magnet = 0
 draw_on = False
 drowOn = False
 radius = 10
-boundaries = 60
+boundaries_x = 150
+boundaries_y = 150
 screen_width, screen_height = pygame.display.get_surface().get_size()
-xl = screen_width-(boundaries*2)
-xs = boundaries
-yl = screen_height-(boundaries*2)
-ys = boundaries
+xl = screen_width-(boundaries_x*2)
+xs = boundaries_x
+yl = screen_height-(boundaries_y*2)
+ys = boundaries_y
 flag = 1
 new_points = []
 points = []
@@ -213,13 +212,11 @@ sheep_size = 100
 
 
 # Serial Setup
+gSer = serial.Serial('/dev/ttyACM0', '115200')
 
-# gSer=serial.Serial('/dev/ttyACM0','115200')
-# time.sleep(3)
-# gSer.flush()
-# serL.write("r\n")
-# serR.write("r\n")
-# time.sleep(6.1)
+time.sleep(3)
+gSer.flush()
+
 
 # Setting Up Images
 clear = pygame.image.load('clear.png').convert()
@@ -277,9 +274,9 @@ def update_camels():
     screen.blit(bg, (0, 0))
     screen.blit(fence_image, (screen_width-560, 20))
     screen.blit(startL, rectStart)
-    rect = pygame.draw.rect(screen, (220, 182, 122), (xs, ys, xl, yl), 7)
-    pygame.draw.circle(screen, (204, 102, 20),
-                       [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
+    # rect = pygame.draw.rect(screen, (220, 182, 122), (xs, ys, xl, yl), 7)
+    # pygame.draw.circle(screen, (204, 102, 20),
+    #                    [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
     for camel in camels:
         if camel.drawn_point is not camel.point:
             # pygame.draw.line(screen, (100, 74, 54, 0.5), (camel.point.x,
@@ -311,24 +308,72 @@ def update_camels():
 #                 camels.append(camel(point(random_x, random_y)))
 #                 generated += 1
 
-camels = [camel(point(200, 200)), camel(
-    point(1000, 600)), camel(point(200, 600))]
+camels = [camel(point(500, 600)), camel(
+    point(300, 300)), camel(point(1000, 500))]
 
 
 firstOpen = False
 
+
+x = []
+y = []
+gSer.flush()
+print(gSer.readline())
+print(gSer.readline())
+time.sleep(1)
+gSer.write(str.encode('$X\n'))
+# gSer.write(str.encode('M5\n'))
+gSer.write(str.encode('M3 S100\n'))
+gSer.write(str.encode('M3 S500\n'))
+gSer.write(str.encode('$H\n'))
+
+time.sleep(5)
+# time.sleep(15)
+
+gSer.write(str.encode('$X\n'))
+gSer.write(str.encode('M3 S500\n'))
+time.sleep(1)
+gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
+print(gSer.readline())
+time.sleep(0.1)
+#gSer.write(str.encode('G10 P1 L20 \n'))
+gSer.write(str.encode('G21 X25  Y-10 F4000\n'))
+print(gSer.readline())
+time.sleep(0.1)
+gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
+print(gSer.readline())
+time.sleep(2)
+gSer.write(str.encode('$X\n'))
+print(gSer.readline())
+gSer.write(str.encode('M3 S1000\n'))
+print(gSer.readline())
+gSer.write(str.encode(' G21 X0 Y-154 F4000\n'))
+print(gSer.readline())
+gSer.write(str.encode('$X\n'))
+gSer.write(str.encode(' G21 X250 Y-154 F4000\n'))
+print(gSer.readline())
+gSer.write(str.encode('$X\n'))
+gSer.write(str.encode(' G21 X0 Y0 F4000\n'))
+print(gSer.readline())
+gSer.write(str.encode('$X\n'))
+gSer.write(str.encode('M3 S1000\n'))
+#gSer.write(str.encode(' G21 X20  Y-20 F4000\n'))
+#gSer.write(str.encode(' \n'))
+time.sleep(2)
+#gSer.write(str.encode('M3 S10\n'))
+#gSer.write(str.encode('G0 X0 Y0\n' ))
+
 try:
     while True:
         # INSIDE OF THE GAME LOOP
-        magnet_visualizer()
         if not firstOpen:
             firstOpen = True
             # randomizingCamels(4)
             screen.fill((106, 164, 82))
-            rect = pygame.draw.rect(
-                screen, (220, 182, 122), (xs, ys, xl, yl), 7)
-            pygame.draw.circle(screen, (204, 102, 20),
-                               [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
+            # rect = pygame.draw.rect(
+            #     screen, (220, 182, 122), (xs, ys, xl, yl), 7)
+            # pygame.draw.circle(screen, (204, 102, 20),
+            #                    [screen_width/2, screen_height/2 - 20], screen_height/4, 7)
 
         # screen.blit(clear, rectClear)
         # screen.blit(load, rectLoad)
@@ -395,18 +440,19 @@ try:
 # Drawing check
 
             if e.type == pygame.MOUSEBUTTONDOWN and rect.collidepoint(e.pos) and drowOn:
-
                 draw_on = True
                 if e.type == pygame.MOUSEBUTTONUP:
                     draw_on = False
+
             anyPoint = False
             current = 0
-            for new_point in new_points:
-                if new_point.collidepoint(e.pos):
-                    newPoint = new_point
-                    anyPoint = True
-                    break
-                current += 1
+            if e.type == pygame.MOUSEMOTION:
+                for new_point in new_points:
+                    if new_point.collidepoint(e.pos):
+                        newPoint = new_point
+                        anyPoint = True
+                        break
+                    current += 1
 
             if draw_on and e.type == pygame.MOUSEMOTION and rect.collidepoint(e.pos) and anyPoint and newPoint.collidepoint(e.pos):
 
@@ -426,7 +472,7 @@ try:
                     gcodeString = "G21 X" + \
                         "{:.3f}".format(xc)+" Y"+"{:.3f}".format(yc)+" F4000\n"
                     print(gcodeString)
-                    # gSer.write(str.encode(gcodeString))
+                    gSer.write(str.encode(gcodeString))
                     # print 'xp: '+str(xp0)+'yp: '+str(yp0)+'xc: '+str(xc)+'yc: '+str(yc)
                     # thL=-90+thL
                     # thR=90+thR
@@ -483,7 +529,7 @@ try:
                     y_magnet = yc
                     if(flag == 1):
                         #################SEND GCODE END COMMAND######################
-                        # gSer.write(str.encode(gcodeString))
+                        gSer.write(str.encode(gcodeString))
                         # sting2send=str(thR)+'\n'
                         # serR.write(sting2send)
                         # readlinR = serR.readline()
@@ -502,8 +548,8 @@ try:
 except StopIteration:
     pass
 string2send = str(0.0)+'\n'
-# gSer.write(str.encode('M3 S100\n'))
-# gSer.write(str.encode('M3 S800\n'))
+gSer.write(str.encode('M3 S100\n'))
+gSer.write(str.encode('M3 S800\n'))
 # serL.write(string2send)
 # serR.write(string2send)
 # time.sleep(0.1)
