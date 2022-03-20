@@ -21,7 +21,6 @@ class DrawArea:
 
     def draw_canvas(self, screen, pen_color, pen_size):
         # pygame.draw.rect(screen, self.color, self.canvas)
-        # print('Ye I''m here')
         for i in range(1, len(self.points)):
             is_a_break = False
             for b in self.breaks:
