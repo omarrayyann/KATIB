@@ -2,22 +2,35 @@ import pygame
 import Cell
 import math
 import copy
+import datetime
+import csv
+import os
 
 
+# Return the euclidean distance between 2 points
 def dist(point1, point2):
     return math.sqrt(math.pow(point1[0] - point2[0], 2) + math.pow(point1[1] - point2[1], 2))
 
 
+# Return the midpoint of 2 points
 def find_midpoint(point1, point2):
     mid_x = (point1[0] + point2[0]) / 2
     mid_y = (point1[1] + point2[1]) / 2
     return (mid_x, mid_y)
 
 
+# Return the relative orientation (vertical/horizontal) of 2 points
+def relative_orientation(point1, point2):
+    if point1[0] == point2[0]:
+        return 'v'
+    else:
+        return 'h'
+
+
 # The Maze class handles creating and solving the maze
 class Maze:
+    # The minimum distance between any two points in the set of points Katib needs to follow
     min_distance = 10
-    resolution = 10
 
     # Constructor
     def __init__(self, w, draw_width, draw_height):
@@ -29,7 +42,8 @@ class Maze:
         self.grid = []
         self.stack = []
         self.solution_cells = []
-        self.solution_points = []
+        self.katib_points = []
+        self.drawn_solution = []
         self.create_cells()
         self.current = self.grid[0]
         self.stack.append(self.current)
@@ -37,8 +51,10 @@ class Maze:
         self.drawn = False
         self.saved = False
         self.maze_image = ''
+        self.time_of_creation = datetime.datetime.now()
+        self.version = 0
 
-    # Returns the 1-D index from the column and row indeces
+    # Returns the 1-D index from the column and row indices
     def index(self, i, j):
         return j + self.cols * i
 
@@ -49,39 +65,60 @@ class Maze:
                 self.grid.append(Cell.Cell(i, j, self))
 
     # Draws out all the cells in the grid list starting from a defined position
-    def draw_maze(self, screen, line_color, x_start, y_start, show):
-        if self.maze_image != '':
+    def draw_maze(self, screen, line_color, x_start, y_start, skip, show):
+        while skip and not self.drawn:
+            self.move(x_start, y_start)
+        if self.maze_image != '':  # If we have saved the maze, there's no need for recomputation
             screen.blit(self.maze_image, (x_start, y_start))
         else:
+            # Draw every cell in the maze
             for i in range(self.rows):
                 for j in range(self.cols):
                     self.grid[self.index(i, j)].draw_cell(screen, line_color, x_start, y_start, self.w)
+            # If we still haven't finished drawing the maze, highlight the current for visual purposes
             if not self.drawn:
                 self.highlight_current(screen, x_start, y_start)
-        if show:
+        # If the maze has been fully drawn and saved, and the user asked for the solution to be shown, draw the solution
+        if show and self.saved:
             self.highlight_solution(screen)
 
+    # Hightlights the current cell with a certain color
     def highlight_current(self, screen, x_start, y_start):
         highlight = pygame.draw.rect(screen, (0, 0, 100), pygame.Rect(self.current.j * self.w + x_start + 2,
                                                                       self.current.i * self.w + y_start + 2, self.w - 4,
                                                                       self.w - 4))
         pygame.display.update(highlight)
 
+    # Draws out the solution
     def highlight_solution(self, screen):
-        for i in range(0, len(self.solution_points), Maze.resolution):
-            circle = pygame.draw.circle(screen, (100, 100, 100), self.solution_points[i], 10)
-            pygame.display.update(circle)
+        for i in range(len(self.drawn_solution) - 1):
+            lin = pygame.draw.line(screen, (100, 100, 100, 0.5), self.drawn_solution[i], self.drawn_solution[i + 1], 20)
+            # pygame.display.update(lin)
 
+    # This function is called when the stack holds cells from the start to the end points with some needless detours
+    # in between
     def find_solution(self, x_start, y_start):
-        self.solution_cells = copy.copy(self.stack)
-        self.solution_cells = list(dict.fromkeys(self.solution_cells))
+        self.solution_cells = copy.copy(self.stack)  # Produce a copy of the current state of the stack
+        self.solution_cells = list(dict.fromkeys(self.solution_cells))  # Remove all redundancies
+
+        # Create the set of points to be drawn and points to be followed by Katib
         for cell in self.solution_cells:
-            self.solution_points.append(((cell.j + (1 / 2)) * self.w + x_start, (cell.i + (1 / 2)) * self.w + y_start))
-        while dist(self.solution_points[len(self.solution_points) - 1],
-                   self.solution_points[len(self.solution_points) - 2]) > Maze.min_distance:
-            for i in range(1, 2 * len(self.solution_points) - 1, 2):
-                point = find_midpoint(self.solution_points[i], self.solution_points[i - 1])
-                self.solution_points.insert(i, point)
+            self.drawn_solution.append(((cell.j + (1 / 2)) * self.w + x_start, (cell.i + (1 / 2)) * self.w + y_start))
+            self.katib_points.append(((cell.j + (1 / 2)) * self.w + x_start, (cell.i + (1 / 2)) * self.w + y_start))
+
+        # Remove all redundant points in the drawn solution
+        prev_orientation = ''
+        for i in range(len(self.drawn_solution) - 1, 0, -1):
+            if relative_orientation(self.drawn_solution[i], self.drawn_solution[i - 1]) == prev_orientation:
+                self.drawn_solution.pop(i)
+            prev_orientation = relative_orientation(self.drawn_solution[i], self.drawn_solution[i - 1])
+
+        # Add points in the katib_points set until no two points are further than min_distance away from each other
+        while dist(self.katib_points[len(self.katib_points) - 1],
+                   self.katib_points[len(self.katib_points) - 2]) > Maze.min_distance:
+            for i in range(1, 2 * len(self.katib_points) - 1, 2):
+                point = find_midpoint(self.katib_points[i], self.katib_points[i - 1])
+                self.katib_points.insert(i, point)
 
     def move(self, x_start, y_start):
         next_cell = self.current.check_neighbors()
@@ -99,3 +136,22 @@ class Maze:
             self.stack.pop()
         elif len(self.stack) == 0:
             self.drawn = True
+
+    def save_maze(self, screen, start_x, start_y):
+        path = 'save_data'
+        if not os.path.exists(path):
+            os.mkdir(path)
+        path += '\\' + self.time_of_creation.strftime("%d-%m-%Y")
+        if not os.path.exists(path):
+            os.mkdir(path)
+        path += '\\' + self.time_of_creation.strftime("%H-%M-%S")
+        if not os.path.exists(path):
+            os.mkdir(path)
+        file_name = path + '\\Maze_' + self.time_of_creation.strftime("%d-%m-%Y_%H-%M-%S") + '_v.' + str(self.version)
+        rect = pygame.Rect(start_x, start_y, self.draw_width, self.draw_height)
+        maze_area = screen.subsurface(rect)
+        pygame.image.save(maze_area, file_name + '.png')
+        f = open(file_name + '.csv', 'w')
+        writer = csv.writer(f)
+        f.close()
+        self.version += 1
