@@ -7,7 +7,7 @@ def dist(point1, point2):
 
 
 class DrawArea:
-    min_distance = 20
+    min_distance = 10
 
     def __init__(self, width, height, top_left, color):
         self.width = width

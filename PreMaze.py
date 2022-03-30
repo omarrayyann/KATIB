@@ -9,22 +9,37 @@ import Maze
 
 
 # Initializing pygame
+import PreMaze
+
 pygame.init()
 fpsClock = pygame.time.Clock()
 FPS = 100
 show = False
 skip = False
 
+# Electromagnet Setup
+force_pin = 18
+magnet1Pin = 23
+magnet2Pin = 24
+
 # Screen Setup
 # width = 1600
 # height = 900
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN, 32)
-# screen = pygame.display.set_mode((900, 500))
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 (width, height) = pygame.display.get_window_size()
 pygame.display.set_caption('Maze Serious Game')
 bg_color = (0, 0, 0)
 area_ratio = (4 / 5)
 start_pos = (10, 10)
+
+# Serial Setup
+
+# gSer=serial.Serial('/dev/ttyACM0','115200')
+# time.sleep(3)
+# gSer.flush()
+# serL.write("r\n")
+# serR.write("r\n")
+# time.sleep(6.1)
 
 # Maze & Draw Area lists + current parameter
 mazes = []
@@ -40,6 +55,7 @@ clear = pygame.transform.rotate(clear, 180)
 clear_btn = Button.Button(clear, 'clear', 50, (width * area_ratio + (1/2) * (1-area_ratio) * width, 70))
 buttons.append(clear_btn)
 
+# New/Next Maze Button
 add = pygame.image.load('addedit.png').convert()
 add = pygame.transform.scale(add, (50, 50))
 new = pygame.image.load('start.png').convert()
@@ -48,11 +64,13 @@ new = pygame.transform.rotate(new, 180)
 new_btn = Button.Button(add, 'Next Maze', 50, (width * area_ratio + (1/2) * (1-area_ratio) * width, 200))
 buttons.append(new_btn)
 
+# Previous maze button
 prev = pygame.image.load('start.png').convert()
 prev = pygame.transform.scale(prev, (50, 50))
 prev_btn = Button.Button(prev, 'Prev Maze', 50, (width * area_ratio + (1/2) * (1-area_ratio) * width, 330))
 buttons.append(prev_btn)
 
+# Show/Hide Solution Button
 open_eye = pygame.image.load('openeye.png').convert()
 open_eye = pygame.transform.scale(open_eye, (50, 50))
 closed_eye = pygame.image.load('closedeye.png').convert()
@@ -60,6 +78,7 @@ closed_eye = pygame.transform.scale(closed_eye, (50, 50))
 sol_btn = Button.Button(open_eye, 'Prev Maze', 50, (width * area_ratio + (1/2) * (1-area_ratio) * width, 460))
 buttons.append(sol_btn)
 
+# Save Button
 save = pygame.image.load('save.png').convert()
 save = pygame.transform.scale(save, (50, 50))
 save_btn = Button.Button(save, 'Save', 50, (width * area_ratio + (1/2) * (1-area_ratio) * width, 590))
@@ -68,6 +87,38 @@ buttons.append(save_btn)
 exit_game = pygame.image.load('exit.png')
 close = pygame.image.load('close.png')
 
+def invKin(x_in, y_in):
+    # x_in = 0.024+0.052*(1-(xs+xl-x_in)/xl)
+    # y_in = 0.1171+0.047*((ys+yl-y_in)/yl)
+    R = math.sqrt(x_in**2+y_in**2)
+    k = math.atan(y_in/x_in)
+    phi = math.acos(R/0.2)
+
+    thetaL = math.degrees(k+phi)
+
+    x_in = x_in-0.1
+
+    R = math.sqrt(x_in**2+y_in**2)
+    k = math.atan(y_in/x_in)
+    phi = math.acos(R/0.2)
+
+    thetaR = math.degrees((k-phi))
+
+    return 90.0+thetaR, -90.0+thetaL
+
+def getCoords(xn, yn):
+    if xn < xs+xl and xn >= xs:
+        xn = (xn-xs)/xl
+    else:
+        return
+    if yn < ys+yl and yn >= ys:
+        yn = (yn-ys)/yl
+    else:
+        return
+    fx = 143*xn
+    # fy= 0.00017125*yn+0.09431875
+    fy = -95*yn
+    return fx, fy
 
 def create_maze(difficulty):
     draw_width = math.floor(width * area_ratio - 20)
@@ -135,15 +186,38 @@ try:
                     show = not show
                 elif e.type == pygame.MOUSEBUTTONDOWN and buttons[4].rect.collidepoint(e.pos) and mazes[current].saved:
                     mazes[current].save_maze(screen, start_pos[0], start_pos[1])
+                if draw_areas[current].drawing:
+                    (j, i) = (int((e.pos[0] - start_pos[0])/mazes[current].w), int((e.pos[1] - start_pos[1])/mazes[current].w))
+                    if draw_areas[current].canvas.collidepoint(e.pos):
+                        for line in mazes[current].grid[mazes[current].index(i, j)].lines:
+                            if line.collidepoint(e.pos):
+                                draw_areas[current].drawing = False
+                                if len(draw_areas[current].points) - 1 != -1:
+                                    draw_areas[current].breaks.append(len(draw_areas[current].points) - 1)
                 draw_areas[current].interact(e)
             if e.type == pygame.MOUSEBUTTONDOWN and buttons[1].rect.collidepoint(e.pos):
                 current += 1
                 if buttons[1].text == 'New Maze':
-                    maze = create_maze(15)
+                    maze = create_maze(50)
                     mazes.append(maze)
                     draw_areas.append(create_draw_area(mazes[current].draw_width, maze.draw_height))
 
         # fpsClock.tick(FPS)
 except StopIteration:
     pass
+
+# gSer.write(str.encode('M3 S100\n'))
+# gSer.write(str.encode('M3 S800\n'))
+# serL.write(string2send)
+# serR.write(string2send)
+# time.sleep(0.1)
+# serL.close()
+# gSer.close()
+# serR.close()
+# Electromagnet cleanup
+# GPIO.output(magnet1Pin,GPIO.LOW)
+# GPIO.output(magnet2Pin,GPIO.LOW)
+# GPIO.output(force_pin,GPIO.LOW)
+# GPIO.cleanup()
+
 pygame.quit()
