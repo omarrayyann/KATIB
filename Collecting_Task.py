@@ -7,13 +7,8 @@ from numpy import False_
 import pygame
 import random
 import time
-import string
-import os
-import csv
-import copy
 from scipy import rand
 import serial
-import math
 
 
 class Point:
@@ -26,7 +21,7 @@ class Camel:
     def __init__(self, point):
         self.point = point
         self.collected = False
-        self.path_coordinates = generate_path_coordinates_parabola(point)
+        self.path_coordinates = generate_path_coordinates(point)
         self.drawn_point = point
 
 
@@ -49,15 +44,24 @@ new_points = []
 points = []
 camels = []
 goal = 5
+firstOpen = True
+x = []
+y = []
+pygame.mixer.init()  # Initialize the mixer module.
+sound1 = pygame.mixer.Sound('success.mp3')  # Load a sound.
+working = True
+rect = pygame.draw.rect(screen, (255, 255, 255),
+                        (x_size, y_size, x_length, y_length), 5)
 
 
 def draw_path(points):
     for v in range(len(points)-1):
-        pygame.draw.line(screen, (100, 74, 54, 0.5),
+        pygame.draw.line(screen, (199, 199, 199, 0.5),
                          (points[v].x, points[v].y),  (points[v+1].x, points[v+1].y), 6)
 
 
 def generate_path_coordinates_parabola(from_point):
+
     randomX = random.uniform(
         screen_width/2 - screen_height/4.5, screen_width/2 + screen_height/4)
 
@@ -78,11 +82,15 @@ def generate_path_coordinates_parabola(from_point):
     y2 = between_point.y
     y3 = to_point.y
 
-    C = (x1-x2) * (x1-x3) * (x2-x3)
-    A = (x3 * (y2-y1) + x2 * (y1-y3) + x1 * (y3-y2)) / C
-    B = (x3*x3 * (y1-y2) + x2*x2 * (y3-y1) + x1*x1 * (y2-y3)) / C
-    C = (x2 * x3 * (x2-x3) * y1+x3 * x1 *
-         (x3-x1) * y2+x1 * x2 * (x1-x2) * y3) / C
+    # C = (x1-x2) * (x1-x3) * (x2-x3)
+    # A = (x3 * (y2-y1) + x2 * (y1-y3) + x1 * (y3-y2)) / C
+    # B = (x3*x3 * (y1-y2) + x2*x2 * (y3-y1) + x1*x1 * (y2-y3)) / C
+    # C = (x2 * x3 * (x2-x3) * y1+x3 * x1 *
+    #      (x3-x1) * y2+x1 * x2 * (x1-x2) * y3) / qC
+
+    A = (y1-y3)/(x1**2-2*x2*x1-x3**2+2*x2*x3)
+    B = -2*A*x2
+    C = y1 - A*(x1**2) - B*x1
 
     points = []
 
@@ -145,10 +153,6 @@ startL = pygame.transform.scale(startL, (207, 64))
 rectStart = startL.get_rect()
 rectStart.center = (130, screen_height-52)
 
-pygame.draw.circle(screen, (0, 255, 0), (int(x_size), int(y_size)), radius)
-pygame.draw.circle(screen, (0, 0, 255), (int(
-    x_size+x_length), int(y_size+y_length)), radius)
-
 bg = pygame.image.load("grass2.jpg")
 
 sheep_image = pygame.image.load("sheep.png")
@@ -160,15 +164,17 @@ fence_image = pygame.transform.flip(fence_image, True, False)
 fence_image = pygame.transform.scale(fence_image, (469, 345))
 
 
-def update_camels():
+def update_screen():
+    # Default Screen Setup
     screen.fill((106, 164, 82))
     screen.blit(bg, (0, 0))
     screen.blit(fence_image, (screen_width/2 - 469/2, screen_height/2 - 345/2))
     screen.blit(startL, rectStart)
+    # Updated sheep on the screen
     for camel in camels:
         if camel.drawn_point is not camel.point:
             draw_path(camel.path_coordinates)
-            pygame.draw.circle(screen, (100, 74, 54, 0.5),
+            pygame.draw.circle(screen, (199, 199, 199, 0.5),
                                (camel.path_coordinates[len(camel.path_coordinates)-1].x, camel.path_coordinates[len(camel.path_coordinates)-1].y), 10)
             camel.drawn_point = camel.point
         screen.blit(sheep_image, (camel.point.x - 50,
@@ -187,14 +193,8 @@ def genreating_sheep():
 
         if (x_random-screen_width/2)**2 + (y_random-screen_height/2)**2 > outside_radius**2:
             camels = [Camel(Point(x_random, y_random))]
-            update_camels()
+            update_screen()
 
-
-firstOpen = True
-
-
-x = []
-y = []
 # gSer.flush()
 # print(gSer.readline())
 # print(gSer.readline())
@@ -234,14 +234,6 @@ y = []
 # gSer.write(str.encode('M3 S1000\n'))
 # time.sleep(2)
 
-pygame.mixer.init()  # Initialize the mixer module.
-# sound1 = pygame.mixer.Sound('success.mp3')  # Load a sound.
-
-working = True
-
-rect = pygame.draw.rect(screen, (255, 255, 255),
-                        (x_size, y_size, x_length, y_length), 5)
-
 
 while working:
     # INSIDE OF THE GAME LOOP
@@ -266,11 +258,11 @@ while working:
             collected = 0
             camels = []
             genreating_sheep()
-            update_camels()
             drowOn = True
             for camel in camels:
                 new_points.append(pygame.draw.circle(
-                    screen, (200, 0, 0), (camel.path_coordinates[0].x, camel.path_coordinates[0].y), 20))
+                    screen, (0, 0, 0), (camel.path_coordinates[0].x, camel.path_coordinates[0].y), 20))
+            update_screen()
 
         # Drawing check
         if e.type == pygame.MOUSEBUTTONDOWN and drowOn and rect.collidepoint(e.pos):
@@ -316,14 +308,14 @@ while working:
 
                 new_points[current] = pygame.draw.circle(
                     screen, (0, 0, 255), (xp0, yp0), 30)
-                update_camels()
+                update_screen()
                 pygame.display.flip()
                 time.sleep(0.002)
 
             else:
                 collected += 1
                 camels = []
-                # sound1.play()
+                sound1.play()
 
                 if collected == goal:
 
@@ -334,11 +326,9 @@ while working:
                     if(flag == 1):
                         #################SEND GCODE END COMMAND######################
                         # gSer.write(str.encode(gcodeString))
-
                         draw_on = False
                         drawOn = False
                         # REVERSE MAGNET POLARIT
-
                         flag = 0
                         time.sleep(0.02)
                 else:
