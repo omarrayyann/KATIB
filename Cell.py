@@ -19,24 +19,25 @@ class Cell:
         self.walls = [True, True, True, True]
         self.visited = False
         self.parent_maze = parent_maze
+        self.lines = []
 
     # Draws the cell on the screen
     def draw_cell(self, screen, line_color, x_start, y_start, w):
-        lines = []
+        self.lines.clear()
         x = x_start + self.j * w
         y = y_start + self.i * w
         # Coloring in visited cells
         #if self.visited:
             # pygame.draw.rect(screen, (100, 0, 100), pygame.Rect(x, y, w, w))
         if self.walls[0]:
-            lines.append(pygame.draw.line(screen, line_color, (x, y), (x + w, y)))
+            self.lines.append(pygame.draw.line(screen, line_color, (x, y), (x + w, y), 10))
         if self.walls[1]:
-            lines.append(pygame.draw.line(screen, line_color, (x + w, y), (x + w, y + w)))
+            self.lines.append(pygame.draw.line(screen, line_color, (x + w, y), (x + w, y + w), 10))
         if self.walls[2]:
-            lines.append(pygame.draw.line(screen, line_color, (x + w, y + w), (x, y + w)))
+            self.lines.append(pygame.draw.line(screen, line_color, (x + w, y + w), (x, y + w), 10))
         if self.walls[3]:
-            lines.append(pygame.draw.line(screen, line_color, (x, y + w), (x, y)))
-        for line in lines:
+            self.lines.append(pygame.draw.line(screen, line_color, (x, y + w), (x, y), 10))
+        for line in self.lines:
             pygame.display.update(line)
 
     def check_neighbors(self):
