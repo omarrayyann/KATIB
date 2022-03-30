@@ -1,0 +1,10 @@
+import pygame
+
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+
+working = True
+
+while working:
+
+    for e in pygame.event:
+        print("hello")
