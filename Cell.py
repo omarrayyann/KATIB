@@ -1,8 +1,5 @@
 import pygame
-import Maze
-import math
 import random
-import seed
 import time
 
 random.seed(time.time())
