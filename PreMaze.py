@@ -148,16 +148,16 @@ try:
         pygame.display.flip()
         screen.fill(bg_color)
         if current + 1 == len(mazes):
-            buttons[1].switch_img(0, buttons[1].size)
+            buttons[1].switch_img(0)
             buttons[1].txt = 'New Maze'
         else:
-            buttons[1].switch_img(1, buttons[1].size)
+            buttons[1].switch_img(1)
             buttons[1].txt = 'Next Maze'
         if show:
-            buttons[3].switch_img(0, buttons[3].size)
+            buttons[3].switch_img(0)
             buttons[3].txt = 'Hide Solution'
         else:
-            buttons[3].switch_img(1, buttons[3].size)
+            buttons[3].switch_img(1)
             buttons[3].txt = 'Show Solution'
         if current != -1:
             mazes[current].draw_maze(screen, (255, 255, 255), start_pos[0], start_pos[1], skip, show)
