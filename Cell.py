@@ -16,6 +16,13 @@ class Cell:
         self.parent_maze = parent_maze
         self.lines = []
 
+    def adjust_fence_size(self, size):
+        factor = Cell.size[1] / parent_maze.w
+        for i in range(len(Cell.fence_pieces)):
+            size = Cell.fence_pieces[i].get_size()
+            new_size = (size[0] / factor, size[1] / factor)
+            Cell.fence_pieces[i] = pygame.transform.scale(Cell.fence_pieces[i], new_size)
+
     # Draws the cell on the screen
     def draw_cell(self, screen, line_color, x_start, y_start, w):
         self.lines.clear()
@@ -38,6 +45,15 @@ class Cell:
                 screen, line_color, (x, y + w), (x, y), 10))
         for line in self.lines:
             pygame.display.update(line)
+
+        # if self.walls[0]:
+        #     screen.blit(Cell.fence_piece_top, (x, y))
+        # if self.walls[1]:
+        #     screen.blit(Cell.fence_piece_right, (x + w, y))
+        # if self.walls[2]:
+        #     screen.blit(Cell.fence_piece_bottom, (x + w, y + w))
+        # if self.walls[3]:
+        #     screen.blit(Cell.fence_piece_bottom, (x, y + w))
 
     def check_neighbors(self):
         neighbors = []

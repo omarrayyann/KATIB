@@ -14,7 +14,7 @@ def set_volume(new_volume):
     if GameParameters.max_volume >= new_volume >= 0:
         GameParameters.volume = new_volume
     else:
-        print('Error: illegal brightness value')
+        print('Error: illegal volume level')
 
 
 class GameParameters:
