@@ -32,6 +32,12 @@ class Maze:
     # The minimum distance between any two points in the set of points Katib needs to follow
     min_distance = 10
 
+    # fence_piece_top_full_res = pygame.image.load('fence_piece.jpg')
+    # fence_piece_bottom_full_res = pygame.transform.rotate(fence_piece_top_full_res, 180)
+    # fence_piece_left_full_res = pygame.transform.rotate(fence_piece_top_full_res, -90)
+    # fence_piece_right_full_res = pygame.transform.rotate(fence_piece_top_full_res, 90)
+    # fence_pieces_full_res = [fence_piece_top_full_res, fence_piece_right_full_res, fence_piece_bottom_full_res, fence_piece_left_full_res]
+
     # Constructor
     def __init__(self, w, draw_width, draw_height):
         self.w = w
@@ -43,8 +49,17 @@ class Maze:
         self.stack = []
         self.solution_cells = []
         self.katib_points = []
+        self.current_point = 0
         self.drawn_solution = []
         self.create_cells()
+
+        # self.fence_pieces = []
+        # factor = Maze.fence_pieces_full_res[0].get_size()[0] / self.w
+        # for i in range(len(Maze.fence_pieces_full_res)):
+        #     dim = Maze.fence_pieces_full_res[i].get_size()
+        #     new_size = (dim[0] / factor, dim[1] / factor)
+        #     self.fence_pieces.append(pygame.transform.scale(Maze.fence_pieces_full_res[i], new_size))
+
         self.current = self.grid[0]
         self.stack.append(self.current)
         self.current.visited = True

@@ -1,6 +1,6 @@
 import pygame
 import Button
-import serial
+# import serial
 import time
 import GameParameters
 import os
@@ -71,13 +71,13 @@ settings_menu = []
 # Games Menu:
 games_menu = []
 # Round-the-Sheep Button
-rnd_shp_btn = Button.Button('rect', [(0, 0, 0), (50, 50, 50)], (200, 100), 'Round the Sheep', True, 20,
+rnd_shp_btn = Button.Button('rect', [(100, 200, 100), (50, 100, 50)], (500, 150), 'Round the Sheep', True, 50,
                             [(255, 255, 255), (200, 200, 50)], (0, 0))
 # Maze Button
-maze_btn = Button.Button('rect', [(0, 0, 0), (50, 50, 50)], (200, 100), 'Maze', True, 20,
+maze_btn = Button.Button('rect', [(100, 200, 100), (50, 100, 50)], (500, 150), 'Maze', True, 50,
                          [(255, 255, 255), (200, 200, 50)], (0, 0))
 # Hand-writing Button
-hnd_wrtng_btn = Button.Button('rect', [(0, 0, 0), (50, 50, 50)], (200, 100), 'Hand-Writing', True, 20,
+hnd_wrtng_btn = Button.Button('rect', [(100, 200, 100), (50, 100, 50)], (500, 150), 'Hand-Writing', True, 50,
                               [(255, 255, 255), (200, 200, 50)], (0, 0))
 games_menu.append(rnd_shp_btn)
 games_menu.append(maze_btn)
