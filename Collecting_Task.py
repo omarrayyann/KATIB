@@ -47,7 +47,7 @@ goal = 10
 firstOpen = True
 x = []
 y = []
-pygame.mixer.init()  # Initialize the mixer module.
+pygame.mixer.init()  # Initialize the mixer module
 sound1 = pygame.mixer.Sound('success.mp3')  # Load a sound.
 working = True
 rect = pygame.draw.rect(screen, (255, 255, 255),
