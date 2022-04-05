@@ -105,6 +105,7 @@ def switch_to_menu(new_menu):
 
 # Function for calibrating the Katib device
 def calibrate():
+    # S 600 with the Gerbel protocol.
     # Calibrate
     gSer.write(str.encode('$X\n'))
     gSer.write(str.encode('M3 S500\n'))
@@ -173,7 +174,7 @@ try:
                         switch_to_menu(2)
                 elif current_menu == 1:
                     if games_menu[0].rect.collidepoint(e.pos):
-                        import Collecting_Task
+                        exec(open('Collecting_Task.py').read())
                     elif games_menu[1].rect.collidepoint(e.pos):
                         exec(open('PreMaze.py').read())
 except StopIteration:

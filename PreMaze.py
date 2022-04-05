@@ -2,8 +2,6 @@ import pygame
 import time
 import Button
 import DrawArea
-import Maze
-import Cell
 import math
 import Maze
 import GameParameters
@@ -15,7 +13,7 @@ fpsClock = pygame.time.Clock()
 FPS = 100
 
 # Setting up game variables:
-nested = False
+nested = True
 volume = GameParameters.GameParameters.volume
 opacity = 255 - GameParameters.GameParameters.brightness
 show = False
