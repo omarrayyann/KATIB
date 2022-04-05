@@ -21,7 +21,7 @@ class Camel:
     def __init__(self, point):
         self.point = point
         self.collected = False
-        self.path_coordinates = generate_path_coordinates(point)
+        self.path_coordinates = generate_path_coordinates_parabola(point)
         self.drawn_point = point
 
 
@@ -43,7 +43,7 @@ y_size = boundaries_y
 new_points = []
 points = []
 camels = []
-goal = 5
+goal = 10
 firstOpen = True
 x = []
 y = []
@@ -62,58 +62,73 @@ def draw_path(points):
 
 def generate_path_coordinates_parabola(from_point):
 
-    randomX = random.uniform(
-        screen_width/2 - screen_height/4.5, screen_width/2 + screen_height/4)
-
-    a = (((screen_height/4)**2 - (randomX-screen_width/2)**2))**0.5
-
-    randomY = random.uniform(-a, a)+screen_height/2
-
     to_point = Point(screen_width/2, screen_height/2)
 
-    between_point = Point((to_point.x-from_point.x)/2,
-                          (to_point.y-from_point.y)/2)
+    vertical_parabola = 1
+    # bool(random.getrandbits(1))
 
-    x1 = from_point.x
-    x2 = between_point.x
-    x3 = to_point.x
+    if vertical_parabola:
+        done = True
+        while done:
+            done = False
+            randomX = random.uniform(from_point.x, to_point.x)
+            randomY = random.uniform(
+                boundaries_y, screen_height - boundaries_y)
 
-    y1 = from_point.y
-    y2 = between_point.y
-    y3 = to_point.y
+            between_point = Point(randomX, randomY)
+            print("Between points: ", randomX, " , ", randomY)
+            x1, x2, x3 = from_point.x, between_point.x, to_point.x
+            y1, y2, y3 = from_point.y, between_point.y, to_point.y
 
-    # C = (x1-x2) * (x1-x3) * (x2-x3)
-    # A = (x3 * (y2-y1) + x2 * (y1-y3) + x1 * (y3-y2)) / C
-    # B = (x3*x3 * (y1-y2) + x2*x2 * (y3-y1) + x1*x1 * (y2-y3)) / C
-    # C = (x2 * x3 * (x2-x3) * y1+x3 * x1 *
-    #      (x3-x1) * y2+x1 * x2 * (x1-x2) * y3) / qC
+            A = (y1-y3)/(x1**2-2*x2*x1-x3**2+2*x2*x3)
+            B = -2*A*x2
+            C = y1 - A*(x1**2) - B*x1
 
-    A = (y1-y3)/(x1**2-2*x2*x1-x3**2+2*x2*x3)
-    B = -2*A*x2
-    C = y1 - A*(x1**2) - B*x1
+            points = []
 
-    points = []
+            domain = to_point.x - from_point.x
+            distance = ((((to_point.x - from_point.x)**2) +
+                        ((to_point.y-from_point.y)**2))**0.5)
+            n = int(distance/6)
+            x_step_size = domain/n
 
-    domain = to_point.x - from_point.x
-    distance = ((((to_point.x - from_point.x)**2) +
-                ((to_point.y-from_point.y)**2))**0.5)
-    n = int(distance/4)
-    x_step_size = domain/n
+            for i in range(n):
+                x = from_point.x+x_step_size*i
+                y = A*(x**2)+B*(x)+C
+                points.append(Point(x, y))
+                if x < boundaries_x or x > screen_width-boundaries_x or y < boundaries_y or y > screen_height-boundaries_y:
+                    done = True
+    else:
+        randomX = random.uniform(boundaries_x, screen_width/2 - boundaries_x*2)
+        randomY = random.uniform(from_point.y, to_point.y)
 
-    for i in range(n):
-        x = from_point.x+x_step_size*i
-        y = A*(x**2)+B*(x)+C
-        points.append(Point(x, y))
+        between_point = Point(randomX, randomY)
+
+        x1, x2, x3 = from_point.y, between_point.y, to_point.y
+        y1, y2, y3 = from_point.x, between_point.x, to_point.x
+
+        A = (x1-x3)/(y1**2-2*y2*y1-y3**2+2*y2*y3)
+        B = -2*A*y2
+        C = x1 - A*(y1**2) - B*y1
+
+        points = []
+
+        domain = to_point.y - from_point.y
+        distance = ((((to_point.x - from_point.x)**2) +
+                    ((to_point.y-from_point.y)**2))**0.5)
+        n = int(distance/6)
+        y_step_size = domain/n
+
+        for i in range(n):
+            y = from_point.y+y_step_size*i
+            x = A*(y**2)+B*(y)+C
+            points.append(Point(x, y))
     return points
 
 
 def generate_path_coordinates(from_point):
-    randomX = random.uniform(
-        screen_width/2 - screen_height/4.5, screen_width/2 + screen_height/4)
     to_point = Point(screen_width/2, screen_height/2)
     a = (((screen_height/4)**2 - (randomX-screen_width/2)**2))**0.5
-
-    randomY = random.uniform(-a, a)+screen_height/2
     m = (to_point.y-from_point.y)/(to_point.x-from_point.x)
     c = from_point.y - m*from_point.x
     domain = to_point.x - from_point.x
@@ -125,10 +140,12 @@ def generate_path_coordinates(from_point):
     for i in range(n):
         points.append(Point(from_point.x+x_step_size*i,
                             m*(from_point.x+x_step_size*i)+c))
+    print(len(points))
     return points
 
 
 def getCoords(xn, yn):
+    print(" xN: ", xn, " yN: ", yn)
     if xn < x_size+x_length and xn >= x_size:
         xn = (xn-x_size)/x_length
     else:

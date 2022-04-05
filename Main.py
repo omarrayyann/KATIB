@@ -50,7 +50,8 @@ bg = pygame.image.load("bbg.jpg")
 
 # Creating menu-less buttons:
 # Quit Button
-quit_btn = Button.Button('img', ['exit.png'], 50, 'Exit', False, 50, [(0, 0, 0)], (width * (14 / 15), height * (1 / 9)))
+quit_btn = Button.Button('img', ['exit.png'], 50, 'Exit', False, 50, [
+                         (0, 0, 0)], (width * (14 / 15), height * (1 / 9)))
 # Return Button
 prev_menu_btn = Button.Button('img', ['go-back-arrow.png'], 50, 'Prev', False, 50, [(0, 0, 0)],
                               (width / 15, height / 9))
@@ -58,7 +59,8 @@ prev_menu_btn = Button.Button('img', ['go-back-arrow.png'], 50, 'Prev', False, 5
 # Start Menu:
 start_menu = []
 # Start Button
-start_btn = Button.Button('img', ['play.png'], 150, 'PLAY', True, 20, [(255, 255, 255)], (width / 2, height / 2))
+start_btn = Button.Button('img', ['play.png'], 150, 'PLAY', True, 20, [
+                          (255, 255, 255)], (width / 2, height / 2))
 start_menu.append(start_btn)
 # Settings Button
 settings_btn = Button.Button('img', ['settings.png'], 50, 'Settings', False, 50, [(0, 0, 0)],
@@ -84,7 +86,8 @@ games_menu.append(maze_btn)
 games_menu.append(hnd_wrtng_btn)
 
 for i in range(len(games_menu)):
-    games_menu[i].move((width / 2, height / len(games_menu) + i * (games_menu[i].size[1] + padding)))
+    games_menu[i].move((width / 2, height / len(games_menu) +
+                       i * (games_menu[i].size[1] + padding)))
 
 # Grouping all menus
 menus = [start_menu, games_menu, settings_menu]
