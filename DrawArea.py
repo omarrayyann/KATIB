@@ -31,9 +31,9 @@ class DrawArea:
             else:
                 pygame.draw.circle(screen, pen_color, self.points[i], pen_size / 2)
 
-    def interact(self, event):
-        if self.drawing and (len(self.points) == 0 or dist(self.points[len(self.points) - 1], event.pos) > DrawArea.min_distance):
-            self.points.append(event.pos)
+    def interact(self, mouse_pos):
+        if self.drawing and (len(self.points) == 0 or dist(self.points[len(self.points) - 1], mouse_pos) > DrawArea.min_distance):
+            self.points.append(mouse_pos)
 
     def clear_area(self):
         self.points = []
