@@ -8,33 +8,73 @@ import Maze
 
 class Button:
 
-    def __init__(self, image, text, size, center):
-        self.image = image
-        self.rect = image.get_rect()
-        self.rect.center = center
+    def __init__(self, btn_type, imgs_or_colors, size, txt, show_txt, font_size, font_clrs, center):
+        self.btn_type = btn_type
         self.size = size
-        self.text = text
+        self.center = center
+        self.font_size = font_size
+        self.txt = txt
+        self.font_clrs = font_clrs
+        self.mode_index = 0
+        self.show_txt = show_txt
+        if self.btn_type == 'img':
+            self.imgs = imgs_or_colors
+            self.img = pygame.image.load(self.imgs[0]).convert_alpha()
+            self.img = pygame.transform.scale(self.img, (self.size, self.size))
+            self.rect = self.img.get_rect()
+        elif self.btn_type == 'rect':
+            self.rect_clrs = imgs_or_colors
+            self.rect = pygame.Rect(0, 0, size[0], size[1])
+        self.rect.center = center
 
-    #Drawing all the buttons
+    # Resizing the image and/or text
+    def resize(self, new_img_size, new_font_size):
+        self.size = new_img_size
+        self.img = self.img = pygame.transform.scale(self.img, (self.size, self.size))
+        self.rect = self.img.get_rect()
+        self.rect.center = self.center
+        self.font_size = new_font_size
+
+    def move(self, new_center):
+        self.center = new_center
+        self.rect.center = self.center
+
+    def toggle_show(self):
+        self.show_txt = not self.show_txt
+
+    # Drawing a button
     def draw_button(self, screen):
-        screen.blit(self.image, self.rect)
-        font = pygame.font.Font('freesansbold.ttf', 20)
-        text = font.render(self.text, True, (255, 255, 255))
-        text_rect = text.get_rect()
-        text_rect.center = self.rect.center
-        text_rect.top = self.rect.top + self.size + 5
-        screen.blit(text, text_rect)
+        if self.btn_type == 'rect':
+            if self.rect.collidepoint(pygame.mouse.get_pos()):
+                self.hover_mode()
+            else:
+                self.dormant_mode()
+        if self.btn_type == 'img':
+            screen.blit(self.img, self.rect)
+        elif self.btn_type == 'rect':
+            pygame.draw.rect(screen, self.rect_clrs[self.mode_index], self.rect, 0, 3)
+        if self.show_txt:
+            font = pygame.font.Font('freesansbold.ttf', self.font_size)
+            text = font.render(self.txt, True, self.font_clrs[self.mode_index])
+            text_rect = text.get_rect()
+            text_rect.center = self.rect.center
+            if self.btn_type == 'img':
+                text_rect.top = self.rect.top + self.size + 5
+            screen.blit(text, text_rect)
 
-    # Button responses
-    # def interact(self, needed_info):
-    #     if self.interaction == 'clear':
-    #         # needed_info = [draw_areas current]
-    #         needed_info[0][needed_info[1]].clear_area()
-    #     if self.interaction == 'start':
-    #         # needed_info = [mazes draw_areas current difficulty width height area_ratio]
-    #         maze = PreMaze.create_maze(needed_info[3], needed_info[4], needed_info[5], needed_info[6])
-    #         needed_info[0].append(maze)
-    #         needed_info[1].append(self.create_draw_area(maze.draw_width, maze.draw_height, needed_info[7]))
-    #         needed_info[2] += 1
-    #     return needed_info
+    def hover_mode(self):
+        self.switch_mode(1)
 
+    def dormant_mode(self):
+        self.switch_mode(0)
+
+    def switch_img(self, index, size):
+        self.img = pygame.image.load(self.imgs[index]).convert_alpha()
+        self.size = size
+        self.img = pygame.transform.scale(self.img, (self.size, self.size))
+        prev_center = self.rect.center
+        self.rect = self.img.get_rect()
+        self.rect.center = prev_center
+
+    def switch_mode(self, index):
+        self.mode_index = index
