@@ -14,6 +14,7 @@ FPS = 100
 
 # Setting up game variables:
 nested = True
+broken = False
 volume = GameParameters.GameParameters.volume
 opacity = 255 - GameParameters.GameParameters.brightness
 show = False
@@ -120,8 +121,8 @@ def get_coords(xn, yn):
 
 def create_maze(maze_w):
     global xl, yl
-    draw_width = xl
-    draw_height = yl
+    draw_width = int(xl / maze_w) * maze_w
+    draw_height = int(yl / maze_w) * maze_w
     w = maze_w
     maze = Maze.Maze(w, draw_width, draw_height)
     return maze
@@ -189,7 +190,8 @@ try:
                 if e.key == pygame.K_q:
                     raise StopIteration
             if e.type == pygame.MOUSEBUTTONDOWN and prev_menu_btn.rect.collidepoint(e.pos):
-                raise StopIteration
+                broken = True
+                break
             if current != -1:
                 if e.type == pygame.MOUSEBUTTONDOWN:
                     if draw_areas[current].canvas.collidepoint(e.pos) and not mazes[
@@ -233,6 +235,8 @@ try:
                     mazes.append(maze)
                     # Cell.adjust_fence_size(maze.w)
                     draw_areas.append(create_draw_area(mazes[current].draw_width, maze.draw_height))
+        if broken:
+            break
 
 
         # fpsClock.tick(FPS)
