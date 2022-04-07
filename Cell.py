@@ -2,8 +2,6 @@ import pygame
 import random
 import time
 
-random.seed(time.time())
-
 
 # The Cell class handles cell creation
 class Cell:
@@ -31,16 +29,20 @@ class Cell:
         x = x_start + self.j * w
         y = y_start + self.i * w
         # Coloring in visited cells
-        #if self.visited:
-            # pygame.draw.rect(screen, (100, 0, 100), pygame.Rect(x, y, w, w))
+        # if self.visited:
+        # pygame.draw.rect(screen, (100, 0, 100), pygame.Rect(x, y, w, w))
         if self.walls[0]:
-            self.lines.append(pygame.draw.line(screen, line_color, (x, y), (x + w, y), 10))
+            self.lines.append(pygame.draw.line(
+                screen, line_color, (x, y), (x + w, y), 10))
         if self.walls[1]:
-            self.lines.append(pygame.draw.line(screen, line_color, (x + w, y), (x + w, y + w), 10))
+            self.lines.append(pygame.draw.line(
+                screen, line_color, (x + w, y), (x + w, y + w), 10))
         if self.walls[2]:
-            self.lines.append(pygame.draw.line(screen, line_color, (x + w, y + w), (x, y + w), 10))
+            self.lines.append(pygame.draw.line(
+                screen, line_color, (x + w, y + w), (x, y + w), 10))
         if self.walls[3]:
-            self.lines.append(pygame.draw.line(screen, line_color, (x, y + w), (x, y), 10))
+            self.lines.append(pygame.draw.line(
+                screen, line_color, (x, y + w), (x, y), 10))
         for line in self.lines:
             pygame.display.update(line)
 
@@ -57,19 +59,23 @@ class Cell:
         neighbors = []
 
         if self.i != 0:
-            top = self.parent_maze.grid[self.parent_maze.index(self.i - 1, self.j)]
+            top = self.parent_maze.grid[self.parent_maze.index(
+                self.i - 1, self.j)]
             if not top.visited:
                 neighbors.append(top)
         if self.j != self.parent_maze.cols - 1:
-            right = self.parent_maze.grid[self.parent_maze.index(self.i, self.j + 1)]
+            right = self.parent_maze.grid[self.parent_maze.index(
+                self.i, self.j + 1)]
             if not right.visited:
                 neighbors.append(right)
         if self.i != self.parent_maze.rows - 1:
-            bottom = self.parent_maze.grid[self.parent_maze.index(self.i + 1, self.j)]
+            bottom = self.parent_maze.grid[self.parent_maze.index(
+                self.i + 1, self.j)]
             if not bottom.visited:
                 neighbors.append(bottom)
         if self.j != 0:
-            left = self.parent_maze.grid[self.parent_maze.index(self.i, self.j - 1)]
+            left = self.parent_maze.grid[self.parent_maze.index(
+                self.i, self.j - 1)]
             if not left.visited:
                 neighbors.append(left)
 

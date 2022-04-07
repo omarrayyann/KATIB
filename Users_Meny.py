@@ -93,11 +93,10 @@ for i in range(len(games_menu)):
 menus = [start_menu, games_menu, settings_menu]
 
 
-def apply_brightness():
-    global screen
+def apply_brightness(surf):
     s = pygame.Surface((width, height), pygame.SRCALPHA)
     s.fill((0, 0, 0, opacity))
-    screen.blit(s, (0, 0))
+    surf.blit(s, (0, 0))
 
 
 # Function for switching between menus
@@ -156,7 +155,7 @@ try:
         # Only draws the previous menu button if there is a previous menu to go back to
         if len(prev_menu_stack) != 0:
             prev_menu_btn.draw_button(screen)
-        apply_brightness()
+        apply_brightness(screen)
 
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
