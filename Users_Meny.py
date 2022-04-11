@@ -14,12 +14,6 @@ magnet2Pin = 24
 pygame.init()
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 (width, height) = pygame.display.get_surface().get_size()
-boundaries_x = 150
-boundaries_y = 150
-xl = width - (boundaries_x * 2)
-xs = boundaries_x
-yl = height - (boundaries_y * 2)
-ys = boundaries_y
 pygame.display.set_caption('Serious Games')
 
 # Setting up game variables:
@@ -99,11 +93,10 @@ for i in range(len(games_menu)):
 menus = [start_menu, games_menu, settings_menu]
 
 
-def apply_brightness():
-    global screen
+def apply_brightness(surf):
     s = pygame.Surface((width, height), pygame.SRCALPHA)
     s.fill((0, 0, 0, opacity))
-    screen.blit(s, (0, 0))
+    surf.blit(s, (0, 0))
 
 
 # Function for switching between menus
@@ -162,7 +155,7 @@ try:
         # Only draws the previous menu button if there is a previous menu to go back to
         if len(prev_menu_stack) != 0:
             prev_menu_btn.draw_button(screen)
-        apply_brightness()
+        apply_brightness(screen)
 
         for e in pygame.event.get():
             if e.type == pygame.QUIT:

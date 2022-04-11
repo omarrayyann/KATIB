@@ -4,6 +4,7 @@ from cmath import sqrt
 from gc import collect
 from turtle import update
 from numpy import False_
+import numpy
 import pygame
 import random
 import time
@@ -21,7 +22,7 @@ class Camel:
     def __init__(self, point):
         self.point = point
         self.collected = False
-        self.path_coordinates = generate_path_coordinates(point)
+        self.path = generate_path(point, 2)
         self.drawn_point = point
 
 
@@ -43,11 +44,11 @@ y_size = boundaries_y
 new_points = []
 points = []
 camels = []
-goal = 5
+goal = 10
 firstOpen = True
 x = []
 y = []
-pygame.mixer.init()  # Initialize the mixer module.
+pygame.mixer.init()  # Initialize the mixer module
 sound1 = pygame.mixer.Sound('success.mp3')  # Load a sound.
 working = True
 rect = pygame.draw.rect(screen, (255, 255, 255),
@@ -60,75 +61,99 @@ def draw_path(points):
                          (points[v].x, points[v].y),  (points[v+1].x, points[v+1].y), 6)
 
 
-def generate_path_coordinates_parabola(from_point):
+def generate_path(from_point, degree):
 
-    randomX = random.uniform(
-        screen_width/2 - screen_height/4.5, screen_width/2 + screen_height/4)
+    # Straight Line
+    if degree == 1:
+        to_point = Point(screen_width/2, screen_height/2)
+        a = (((screen_height/4)**2 - (randomX-screen_width/2)**2))**0.5
+        m = (to_point.y-from_point.y)/(to_point.x-from_point.x)
+        c = from_point.y - m*from_point.x
+        domain = to_point.x - from_point.x
+        distance = ((((to_point.x - from_point.x)**2) +
+                    ((to_point.y-from_point.y)**2))**0.5)
+        n = int(distance/6)
+        x_step_size = domain/n
+        points = []
+        for i in range(n):
+            points.append(Point(from_point.x+x_step_size*i,
+                                m*(from_point.x+x_step_size*i)+c))
+        print(len(points))
+        return points
 
-    a = (((screen_height/4)**2 - (randomX-screen_width/2)**2))**0.5
+    # Quadratic Graph
+    elif degree == 2:
+        to_point = Point(screen_width/2, screen_height/2)
+        vertical_parabola = 1
+        # bool(random.getrandbits(1))
 
-    randomY = random.uniform(-a, a)+screen_height/2
+        if vertical_parabola:
+            done = True
+            while done:
+                done = False
+                randomX = random.uniform(from_point.x, to_point.x)
+                randomY = random.uniform(
+                    boundaries_y, screen_height - boundaries_y)
 
-    to_point = Point(screen_width/2, screen_height/2)
+                between_point = Point(randomX, randomY)
+                print("Between points: ", randomX, " , ", randomY)
+                x1, x2, x3 = from_point.x, between_point.x, to_point.x
+                y1, y2, y3 = from_point.y, between_point.y, to_point.y
 
-    between_point = Point((to_point.x-from_point.x)/2,
-                          (to_point.y-from_point.y)/2)
+                A = (y1-y3)/(x1**2-2*x2*x1-x3**2+2*x2*x3)
+                B = -2*A*x2
+                C = y1 - A*(x1**2) - B*x1
 
-    x1 = from_point.x
-    x2 = between_point.x
-    x3 = to_point.x
+                points = []
 
-    y1 = from_point.y
-    y2 = between_point.y
-    y3 = to_point.y
+                domain = to_point.x - from_point.x
+                # distance = ((((to_point.x - from_point.x)**2) +
+                #             ((to_point.y-from_point.y)**2))**0.5)
+                x1_intergral = (1/(4*A))*((2*A*x1+B)*(1+(2*A*x1+B))
+                                          ** 0.5+numpy.log(2*A*x1+B+(1+(2*A*x1+B)**2)*0.5))
+                x3_intergral = (1/(4*A))*((2*A*x3+B)*(1+(2*A*x3+B))
+                                          ** 0.5+numpy.log(2*A*x3+B+(1+(2*A*x3+B)**2)*0.5))
+                distance = abs(x3_intergral - x1_intergral)
+                n = int(distance/6)
+                x_step_size = domain/n
 
-    # C = (x1-x2) * (x1-x3) * (x2-x3)
-    # A = (x3 * (y2-y1) + x2 * (y1-y3) + x1 * (y3-y2)) / C
-    # B = (x3*x3 * (y1-y2) + x2*x2 * (y3-y1) + x1*x1 * (y2-y3)) / C
-    # C = (x2 * x3 * (x2-x3) * y1+x3 * x1 *
-    #      (x3-x1) * y2+x1 * x2 * (x1-x2) * y3) / qC
+                for i in range(n):
+                    x = from_point.x+x_step_size*i
+                    y = A*(x**2)+B*(x)+C
+                    points.append(Point(x, y))
+                    if x < boundaries_x or x > screen_width-boundaries_x or y < boundaries_y or y > screen_height-boundaries_y:
+                        done = True
+        else:
+            randomX = random.uniform(
+                boundaries_x, screen_width/2 - boundaries_x*2)
+            randomY = random.uniform(from_point.y, to_point.y)
 
-    A = (y1-y3)/(x1**2-2*x2*x1-x3**2+2*x2*x3)
-    B = -2*A*x2
-    C = y1 - A*(x1**2) - B*x1
+            between_point = Point(randomX, randomY)
 
-    points = []
+            x1, x2, x3 = from_point.y, between_point.y, to_point.y
+            y1, y2, y3 = from_point.x, between_point.x, to_point.x
 
-    domain = to_point.x - from_point.x
-    distance = ((((to_point.x - from_point.x)**2) +
-                ((to_point.y-from_point.y)**2))**0.5)
-    n = int(distance/4)
-    x_step_size = domain/n
+            A = (x1-x3)/(y1**2-2*y2*y1-y3**2+2*y2*y3)
+            B = -2*A*y2
+            C = x1 - A*(y1**2) - B*y1
 
-    for i in range(n):
-        x = from_point.x+x_step_size*i
-        y = A*(x**2)+B*(x)+C
-        points.append(Point(x, y))
-    return points
+            points = []
 
+            domain = to_point.y - from_point.y
+            distance = ((((to_point.x - from_point.x)**2) +
+                        ((to_point.y-from_point.y)**2))**0.5)
+            n = int(distance/6)
+            y_step_size = domain/n
 
-def generate_path_coordinates(from_point):
-    randomX = random.uniform(
-        screen_width/2 - screen_height/4.5, screen_width/2 + screen_height/4)
-    to_point = Point(screen_width/2, screen_height/2)
-    a = (((screen_height/4)**2 - (randomX-screen_width/2)**2))**0.5
-
-    randomY = random.uniform(-a, a)+screen_height/2
-    m = (to_point.y-from_point.y)/(to_point.x-from_point.x)
-    c = from_point.y - m*from_point.x
-    domain = to_point.x - from_point.x
-    distance = ((((to_point.x - from_point.x)**2) +
-                ((to_point.y-from_point.y)**2))**0.5)
-    n = int(distance/6)
-    x_step_size = domain/n
-    points = []
-    for i in range(n):
-        points.append(Point(from_point.x+x_step_size*i,
-                            m*(from_point.x+x_step_size*i)+c))
-    return points
+            for i in range(n):
+                y = from_point.y+y_step_size*i
+                x = A*(y**2)+B*(y)+C
+                points.append(Point(x, y))
+        return points
 
 
 def getCoords(xn, yn):
+    print(" xN: ", xn, " yN: ", yn)
     if xn < x_size+x_length and xn >= x_size:
         xn = (xn-x_size)/x_length
     else:
@@ -173,9 +198,9 @@ def update_screen():
     # Updated sheep on the screen
     for camel in camels:
         if camel.drawn_point is not camel.point:
-            draw_path(camel.path_coordinates)
+            draw_path(camel.path)
             pygame.draw.circle(screen, (199, 199, 199, 0.5),
-                               (camel.path_coordinates[len(camel.path_coordinates)-1].x, camel.path_coordinates[len(camel.path_coordinates)-1].y), 10)
+                               (camel.path[len(camel.path)-1].x, camel.path[len(camel.path)-1].y), 10)
             camel.drawn_point = camel.point
         screen.blit(sheep_image, (camel.point.x - 50,
                                   camel.point.y - 50))
@@ -261,7 +286,7 @@ while working:
             drowOn = True
             for camel in camels:
                 new_points.append(pygame.draw.circle(
-                    screen, (0, 0, 0), (camel.path_coordinates[0].x, camel.path_coordinates[0].y), 20))
+                    screen, (0, 0, 0), (camel.path[0].x, camel.path[0].y), 20))
             update_screen()
 
         # Drawing check
@@ -280,12 +305,12 @@ while working:
 
         if draw_on and e.type == pygame.MOUSEMOTION and rect.collidepoint(e.pos) and anyPoint and newPoint.collidepoint(e.pos):
 
-            if len(camels[current].path_coordinates)-1 > 0:
+            if len(camels[current].path)-1 > 0:
                 flag = 1
-                xp0, yp0 = (camels[current].path_coordinates[0].x,
-                            camels[current].path_coordinates[0].y)
-                camels[current].path_coordinates.pop(0)
-                camels[current].point = camels[current].path_coordinates[0]
+                xp0, yp0 = (camels[current].path[0].x,
+                            camels[current].path[0].y)
+                camels[current].path.pop(0)
+                camels[current].point = camels[current].path[0]
                 x_magnet = xp0
                 y_magnet = yp0
                 pygame.display.update()
