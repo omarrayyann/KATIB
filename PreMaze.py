@@ -7,32 +7,32 @@ import Cell
 import GameParameters
 # import serial
 
-# Initializing pygame
-pygame.init()
-fpsClock = pygame.time.Clock()
-FPS = 100
-
 # Setting up game variables:
-nested = True
+nested = False
 volume = GameParameters.GameParameters.volume
 opacity = 255 - GameParameters.GameParameters.brightness
 show = False
 skip = False
 
-# Electromagnet Setup
-force_pin = 18
-magnet1Pin = 23
-magnet2Pin = 24
+if not nested:
+    # Initializing pygame
+    pygame.init()
+    # fpsClock = pygame.time.Clock()
+    # FPS = 100
+    # Electromagnet Setup
+    force_pin = 18
+    magnet1Pin = 23
+    magnet2Pin = 24
 
-# Screen Setup
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-(width, height) = pygame.display.get_surface().get_size()
-boundaries_x = 150
-boundaries_y = 150
-xl = width - (boundaries_x * 2)
-xs = boundaries_x
-yl = height - (boundaries_y * 2)
-ys = boundaries_y
+    # Screen Setup
+    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    (width, height) = pygame.display.get_surface().get_size()
+    boundaries_x = 150
+    boundaries_y = 150
+    xl = width - (boundaries_x * 2)
+    xs = boundaries_x
+    yl = height - (boundaries_y * 2)
+    ys = boundaries_y
 
 pygame.display.set_caption('Maze Serious Game')
 bg_color = (0, 0, 0)
@@ -175,7 +175,7 @@ try:
                 maze_area = maze_area.copy()
                 maze_area.unlock()
                 mazes[current].maze_image = maze_area
-            draw_areas[current].draw_canvas(screen, (0, 0, 0), 20)
+            draw_areas[current].draw_data(screen, (0, 0, 0), 20)
         for button in buttons:
             button.draw_button(screen)
         prev_menu_btn.draw_button(screen)
@@ -192,12 +192,10 @@ try:
                 raise StopIteration
             if current != -1:
                 if e.type == pygame.MOUSEBUTTONDOWN:
+                    draw_areas[current].toggle_interaction(True)
                     if draw_areas[current].canvas.collidepoint(e.pos) and not mazes[
                         current].drawn:
                         skip = True
-                    elif draw_areas[current].canvas.collidepoint(e.pos) and mazes[
-                        current].drawn:
-                        draw_areas[current].drawing = True
                     elif buttons[0].rect.collidepoint(e.pos):
                         draw_areas[current].clear_area()
                         mazes[current].current_point = 0
@@ -208,11 +206,7 @@ try:
                     elif buttons[4].rect.collidepoint(e.pos) and mazes[
                         current].saved:
                         mazes[current].save_maze(screen, start_pos[0], start_pos[1])
-                elif (e.type == pygame.MOUSEBUTTONUP and draw_areas[current].drawing) or (
-                        draw_areas[current].drawing and not draw_areas[current].canvas.collidepoint(pygame.mouse.get_pos())):
-                    draw_areas[current].drawing = False
-                    if len(draw_areas[current].points) - 1 != -1:
-                        draw_areas[current].breaks.append(len(draw_areas[current].points) - 1)
+                draw_areas[current].interact(pygame.mouse.get_pos(), pygame.mouse.get_pressed()[0])
                 if draw_areas[current].drawing:
                     # Move to next point
                     if magnet_point.collidepoint(pygame.mouse.get_pos()) and mazes[current].current_point != len(mazes[current].katib_points) - 1:
@@ -222,17 +216,15 @@ try:
                     if draw_areas[current].canvas.collidepoint(pygame.mouse.get_pos()):
                         for line in mazes[current].grid[mazes[current].index(i, j)].lines:
                             if line.collidepoint(pygame.mouse.get_pos()):
-                                draw_areas[current].drawing = False
+                                draw_areas[current].toggle_interaction(False)
                                 if len(draw_areas[current].points) - 1 != -1:
                                     draw_areas[current].breaks.append(len(draw_areas[current].points) - 1)
-                draw_areas[current].interact(pygame.mouse.get_pos())
             if e.type == pygame.MOUSEBUTTONDOWN and buttons[1].rect.collidepoint(e.pos):
                 current += 1
                 if buttons[1].txt == 'New Maze':
                     maze = create_maze(150)
                     mazes.append(maze)
-                    # Cell.adjust_fence_size(maze.w)
-                    draw_areas.append(create_draw_area(mazes[current].draw_width, maze.draw_height))
+                    draw_areas.append(create_draw_area(maze.draw_width, maze.draw_height))
 
 
         # fpsClock.tick(FPS)
