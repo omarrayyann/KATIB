@@ -59,8 +59,8 @@ prev_menu_btn = Button.Button('img', ['go-back-arrow.png'], 50, 'Prev', False, 5
 # Start Menu:
 start_menu = []
 # Start Button
-start_btn = Button.Button('img', ['play.png'], 150, 'PLAY', True, 20, [
-                          (255, 255, 255)], (width / 2, height / 2))
+start_btn = Button.Button('img', ['play.png'], 150, 'PLAY', True, 50, [
+                          (0, 0, 0)], (width / 2, height / 2))
 start_menu.append(start_btn)
 # Settings Button
 settings_btn = Button.Button('img', ['settings.png'], 50, 'Settings', False, 50, [(0, 0, 0)],

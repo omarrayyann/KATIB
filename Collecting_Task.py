@@ -26,6 +26,7 @@ class Camel:
         self.drawn_point = point
 
 
+nested = True
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 draw_on = False
 drowOn = False
@@ -360,5 +361,5 @@ while working:
                     genreating_sheep()
 
         pygame.display.flip()
-
-pygame.quit()
+if not nested:
+    pygame.quit()
