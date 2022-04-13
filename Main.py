@@ -14,6 +14,12 @@ magnet2Pin = 24
 pygame.init()
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 (width, height) = pygame.display.get_surface().get_size()
+boundaries_x = 150
+boundaries_y = 150
+xl = width - (boundaries_x * 2)
+xs = boundaries_x
+yl = height - (boundaries_y * 2)
+ys = boundaries_y
 pygame.display.set_caption('Serious Games')
 
 # Setting up game variables:

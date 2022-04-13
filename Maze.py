@@ -45,6 +45,8 @@ class Maze:
         self.draw_height = draw_height
         self.cols = math.floor(draw_width / w)
         self.rows = math.floor(draw_height / w)
+        self.draw_width = self.cols * self.w
+        self.draw_height = self.rows * self.w
         self.grid = []
         self.stack = []
         self.solution_cells = []
@@ -107,7 +109,7 @@ class Maze:
     # Draws out the solution
     def highlight_solution(self, screen):
         for i in range(len(self.drawn_solution) - 1):
-            lin = pygame.draw.line(screen, (100, 100, 100), self.drawn_solution[i], self.drawn_solution[i + 1], 20)
+            pygame.draw.line(screen, (100, 100, 100), self.drawn_solution[i], self.drawn_solution[i + 1], 20)
 
     # This function is called when the stack holds cells from the start to the end points with some needless detours
     # in between
