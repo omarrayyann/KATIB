@@ -101,7 +101,10 @@ menus = [start_menu, games_menu, settings_menu]
 
 def apply_brightness():
     global screen
-    print("sd")
+    print("feeha error")
+    # s = pygame.Surface(( pygame.display.get_surface().get_size()[0],  pygame.display.get_surface().get_size()), pygame.SRCALPHA)
+    # s.fill((0, 0, 0, opacity))
+    # screen.blit(s, (0, 0))
 
 
 # Function for switching between menus
@@ -185,8 +188,6 @@ try:
                         exec(open('Collecting_Task.py').read())
                     elif games_menu[1].rect.collidepoint(e.pos):
                         exec(open('PreMaze.py').read())
-                    elif games_menu[2].rect.collidepoint(e.pos):
-                        exec(open('Writing_Task.py').read())
 except StopIteration:
     pass
 if on_katib:

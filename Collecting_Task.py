@@ -10,6 +10,7 @@ import random
 import time
 from scipy import rand
 import serial
+import GameParameters
 
 
 class Point:
@@ -192,6 +193,7 @@ fence_image = pygame.transform.scale(fence_image, (469, 345))
 
 
 def setup_screen():
+    apply_brightness()
     # Default Screen Setup
     screen.blit(background_image, (0, 0))
     screen.blit(fence_image, (screen_width/2 - 469/2, screen_height/2 - 345/2))
@@ -257,6 +259,15 @@ def genreating_sheep():
 # gSer.write(str.encode('$X\n'))
 # gSer.write(str.encode('M3 S1000\n'))
 # time.sleep(2)
+
+opacity = 255 - GameParameters.GameParameters.brightness
+
+
+def apply_brightness():
+    global screen
+    s = pygame.Surface((screen_height, screen_height), pygame.SRCALPHA)
+    s.fill((0, 0, 0, opacity))
+    screen.blit(s, (0, 0))
 
 
 while working:
