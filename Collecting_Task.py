@@ -24,6 +24,7 @@ class Camel:
         self.collected = False
         self.path = generate_path(point, 2)
         self.drawn_point = point
+        self.started = False
 
 
 nested = True
@@ -45,7 +46,7 @@ y_size = boundaries_y
 new_points = []
 points = []
 camels = []
-goal = 10
+goal = 100
 firstOpen = True
 x = []
 y = []
@@ -179,7 +180,7 @@ startL = pygame.transform.scale(startL, (207, 64))
 rectStart = startL.get_rect()
 rectStart.center = (130, screen_height-52)
 
-bg = pygame.image.load("grass2.jpg")
+background_image = pygame.image.load("grass2.jpg")
 
 sheep_image = pygame.image.load("sheep.png")
 sheep_image = pygame.transform.flip(sheep_image, True, False)
@@ -190,22 +191,20 @@ fence_image = pygame.transform.flip(fence_image, True, False)
 fence_image = pygame.transform.scale(fence_image, (469, 345))
 
 
-def update_screen():
+def setup_screen():
     # Default Screen Setup
-    screen.fill((106, 164, 82))
-    screen.blit(bg, (0, 0))
+    screen.blit(background_image, (0, 0))
     screen.blit(fence_image, (screen_width/2 - 469/2, screen_height/2 - 345/2))
     screen.blit(startL, rectStart)
     # Updated sheep on the screen
     for camel in camels:
-        if camel.drawn_point is not camel.point:
+        if camel.started:
             draw_path(camel.path)
             pygame.draw.circle(screen, (199, 199, 199, 0.5),
                                (camel.path[len(camel.path)-1].x, camel.path[len(camel.path)-1].y), 10)
             camel.drawn_point = camel.point
         screen.blit(sheep_image, (camel.point.x - 50,
                                   camel.point.y - 50))
-    pygame.display.flip()
 
 
 def genreating_sheep():
@@ -219,7 +218,6 @@ def genreating_sheep():
 
         if (x_random-screen_width/2)**2 + (y_random-screen_height/2)**2 > outside_radius**2:
             camels = [Camel(Point(x_random, y_random))]
-            update_screen()
 
 # gSer.flush()
 # print(gSer.readline())
@@ -266,6 +264,8 @@ while working:
     if firstOpen:
         firstOpen = False
 
+    setup_screen()
+
     screen.blit(startL, rectStart)
 
     for e in pygame.event.get():
@@ -288,7 +288,6 @@ while working:
             for camel in camels:
                 new_points.append(pygame.draw.circle(
                     screen, (0, 0, 0), (camel.path[0].x, camel.path[0].y), 20))
-            update_screen()
 
         # Drawing check
         if e.type == pygame.MOUSEBUTTONDOWN and drowOn and rect.collidepoint(e.pos):
@@ -311,6 +310,7 @@ while working:
                 xp0, yp0 = (camels[current].path[0].x,
                             camels[current].path[0].y)
                 camels[current].path.pop(0)
+                camels[current].started = True
                 camels[current].point = camels[current].path[0]
                 x_magnet = xp0
                 y_magnet = yp0
@@ -334,7 +334,6 @@ while working:
 
                 new_points[current] = pygame.draw.circle(
                     screen, (0, 0, 255), (xp0, yp0), 30)
-                update_screen()
                 pygame.display.flip()
                 time.sleep(0.002)
 
