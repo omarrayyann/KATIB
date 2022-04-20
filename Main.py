@@ -1,9 +1,9 @@
 import pygame
 import Button
 # import serial
+import Config
 import time
 import GameParameters
-import os
 
 # Electromagnet Setup
 force_pin = 18
@@ -13,13 +13,15 @@ magnet2Pin = 24
 # Setting up screen
 pygame.init()
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-(width, height) = pygame.display.get_surface().get_size()
+(screen_width, screen_height) = pygame.display.get_surface().get_size()
 boundaries_x = 150
 boundaries_y = 150
-xl = width - (boundaries_x * 2)
+xl = screen_width - (boundaries_x * 2)
 xs = boundaries_x
-yl = height - (boundaries_y * 2)
+yl = screen_height - (boundaries_y * 2)
 ys = boundaries_y
+pygame.display.set_caption('Sign in screen')
+exec(open('Sign_In_Page.py').read())
 pygame.display.set_caption('Serious Games')
 
 # Setting up game variables:
@@ -57,20 +59,20 @@ bg = pygame.image.load("bbg.jpg")
 # Creating menu-less buttons:
 # Quit Button
 quit_btn = Button.Button('img', ['exit.png'], 50, 'Exit', False, 50, [
-                         (0, 0, 0)], (width * (14 / 15), height * (1 / 9)))
+                         (0, 0, 0)], (screen_width * (14 / 15), screen_height * (1 / 9)))
 # Return Button
 prev_menu_btn = Button.Button('img', ['go-back-arrow.png'], 50, 'Prev', False, 50, [(0, 0, 0)],
-                              (width / 15, height / 9))
+                              (screen_width / 15, screen_height / 9))
 
 # Start Menu:
 start_menu = []
 # Start Button
 start_btn = Button.Button('img', ['play.png'], 150, 'PLAY', True, 50, [
-                          (0, 0, 0)], (width / 2, height / 2))
+                          (0, 0, 0)], (screen_width / 2, screen_height / 2))
 start_menu.append(start_btn)
 # Settings Button
 settings_btn = Button.Button('img', ['settings.png'], 50, 'Settings', False, 50, [(0, 0, 0)],
-                             (width / 15, height * (8 / 9)))
+                             (screen_width / 15, screen_height * (8 / 9)))
 start_menu.append(settings_btn)
 
 # Settings Menu:
@@ -92,7 +94,7 @@ games_menu.append(maze_btn)
 games_menu.append(hnd_wrtng_btn)
 
 for i in range(len(games_menu)):
-    games_menu[i].move((width / 2, height / len(games_menu) +
+    games_menu[i].move((screen_width / 2, screen_height / len(games_menu) +
                        i * (games_menu[i].size[1] + padding)))
 
 # Grouping all menus
@@ -100,16 +102,15 @@ menus = [start_menu, games_menu, settings_menu]
 
 
 def apply_brightness():
-    global screen
-    print("feeha error")
-    # s = pygame.Surface(( pygame.display.get_surface().get_size()[0],  pygame.display.get_surface().get_size()), pygame.SRCALPHA)
-    # s.fill((0, 0, 0, opacity))
-    # screen.blit(s, (0, 0))
+    global screen, screen_height, screen_width, opacity
+    s = pygame.Surface((screen_width, screen_height) , pygame.SRCALPHA)
+    s.fill((0, 0, 0, opacity))
+    screen.blit(s, (0, 0))
 
 
 # Function for switching between menus
 def switch_to_menu(new_menu):
-    global current_menu
+    global current_menu, prev_menu_stack
     prev_menu_stack.append(current_menu)
     current_menu = new_menu
 
@@ -118,6 +119,7 @@ def switch_to_menu(new_menu):
 def calibrate():
     # S 600 with the Gerbel protocol.
     # Calibrate
+    global gSer
     gSer.write(str.encode('$X\n'))
     gSer.write(str.encode('M3 S500\n'))
     time.sleep(1)
@@ -154,7 +156,7 @@ def calibrate():
 
 
 try:
-    while True:
+    while Config.signed_in:
         pygame.display.flip()
         screen.blit(bg, (0, 0))
         for button in menus[current_menu]:
