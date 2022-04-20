@@ -1,4 +1,3 @@
-from distutils.command.config import config
 import pygame
 import InputBox
 import Config
@@ -8,15 +7,15 @@ pygame.init()
 screen = pygame.display.set_mode((1600, 900))
 screen_width, screen_height = pygame.display.get_surface().get_size()
 
-background = pygame.image.load("background2.png")
+background = pygame.image.load("Background_Home_Page.png")
 
 run = True
 
 # Start Button
 start_button_width = 592
 start_button_height = 76
-start_button_x = 504
-start_button_y = 661
+start_button_x = 503
+start_button_y = 679
 start_button_color = (255, 195, 0)
 start_button_text_color = (0, 0, 0)
 font = pygame.font.Font('Futura-Bold.otf', 36)
@@ -30,8 +29,8 @@ start_rect = pygame.Rect(start_button_x, start_button_y,
 # Username Field
 username_field_width = 592
 username_field_height = 76
-username_field_x = 500
-username_field_y = 389
+username_field_x = 503
+username_field_y = 409
 username_field = InputBox.InputBox(
     username_field_x, username_field_y, username_field_width, username_field_height)
 username_field_rect = pygame.Rect(
@@ -39,8 +38,8 @@ username_field_rect = pygame.Rect(
 
 password_field_width = 592
 password_field_height = 76
-password_field_x = 500
-password_field_y = 491
+password_field_x = 503
+password_field_y = 511
 password_field = InputBox.InputBox(
     password_field_x, password_field_y, password_field_width, password_field_height)
 password_field_rect = pygame.Rect(
@@ -53,12 +52,6 @@ error = False
 
 def setup_screen():
     screen.blit(background, (0, 0))
-    pygame.draw.rect(screen, (255, 255, 255), username_field_rect, 0, int(
-        username_field_rect.height/3), int(
-        username_field_rect.height/3))
-    pygame.draw.rect(screen, (255, 255, 255), password_field_rect, 0, int(
-        password_field_rect.height/3), int(
-        password_field_rect.height/3))
     pygame.draw.rect(screen, start_button_color, start_rect,
                      0, int(start_button_height/2))
     pygame.draw.rect(screen, (0, 0, 0), start_rect,
@@ -121,10 +114,11 @@ while run:
         if start_rect.collidepoint(pygame.mouse.get_pos()):
             start_button_color = (0, 0, 0)
             start_button_text_color = (255, 195, 0)
-            start_text = font.render("Sign In", True, start_button_text_color)
+            start_text = font.render("START", True, start_button_text_color)
         else:
             start_button_color = (255, 195, 0)
             start_button_text_color = (0, 0, 0)
-            start_text = font.render("Sign In", True, start_button_text_color)
+            start_text = font.render("START", True, start_button_text_color)
+
     pygame.display.flip()
 pygame.quit()
