@@ -187,6 +187,8 @@ try:
                         exec(open('Collecting_Task.py').read())
                     elif games_menu[1].rect.collidepoint(e.pos):
                         exec(open('PreMaze.py').read())
+                    elif games_menu[2].rect.collidepoint(e.pos):
+                        exec(open('Writing_Task.py').read())
 except StopIteration:
     pass
 if on_katib:

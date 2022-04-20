@@ -5,10 +5,10 @@ import Button
 import csv
 import os
 import string
-import serial
+# import serial
 
 # Setting up game variables:
-nested = False
+nested = True
 volume = GameParameters.GameParameters.volume
 opacity = 255 - GameParameters.GameParameters.brightness
 mode = 'letter'
