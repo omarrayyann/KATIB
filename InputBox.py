@@ -26,6 +26,10 @@ class InputBox:
 
     def get_text_secure(self):
         return "*"*len(self.text)
+<<<<<<< HEAD
+=======
+
+>>>>>>> parent of 8e2665b (Fixed InputBox, Button, Sign in, and nesting of modules)
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -57,6 +61,7 @@ class InputBox:
 
     def draw(self, screen):
         # Blit the text.
+<<<<<<< HEAD
 
         if self.secure:
             screen.blit(FONT.render("*"*len(self.text), True, self.color),
@@ -67,3 +72,12 @@ class InputBox:
         # Blit the rect.
         pygame.draw.rect(screen, self.color, self.rect, 3, int(
             self.rect.height/3), int(self.rect.height/3))
+=======
+        
+        if self.secure:
+            screen.blit(FONT.render("*"*len(self.text), True, self.color), (self.rect.x + 20, self.rect.y+ self.h/6 + 10))
+        else:
+            screen.blit(self.txt_surface, (self.rect.x + 20, self.rect.y+ self.h/6 + 3))
+        # Blit the rect.
+        pygame.draw.rect(screen, self.color, self.rect, 3, int(self.rect.height/3), int(self.rect.height/3))
+>>>>>>> parent of 8e2665b (Fixed InputBox, Button, Sign in, and nesting of modules)
