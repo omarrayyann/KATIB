@@ -3,7 +3,6 @@ from asyncio import current_task
 from cmath import sqrt
 from gc import collect
 from turtle import update
-from numpy import False_
 import numpy
 import pygame
 import random
