@@ -28,7 +28,8 @@ class Camel:
 
 
 nested = True
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+# screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((1600, 900))
 draw_on = False
 drowOn = False
 radius = 10
@@ -259,6 +260,7 @@ def genreating_sheep():
 # gSer.write(str.encode('M3 S1000\n'))
 # time.sleep(2)
 
+
 opacity = 255 - GameParameters.GameParameters.brightness
 
 
@@ -273,6 +275,13 @@ while working:
     # INSIDE OF THE GAME LOOP
     if firstOpen:
         firstOpen = False
+        collected = 0
+        camels = []
+        genreating_sheep()
+        drowOn = True
+        for camel in camels:
+            new_points.append(pygame.draw.circle(
+                screen, (0, 0, 0), (camel.path[0].x, camel.path[0].y), 20))
 
     setup_screen()
 
@@ -288,17 +297,6 @@ while working:
         if e.type == pygame.KEYDOWN:
             if e.key == pygame.K_q:
                 working = False
-
-        # Clicked Start
-        if e.type == pygame.MOUSEBUTTONDOWN and rectStart.collidepoint(e.pos):
-            collected = 0
-            camels = []
-            genreating_sheep()
-            drowOn = True
-            for camel in camels:
-                new_points.append(pygame.draw.circle(
-                    screen, (0, 0, 0), (camel.path[0].x, camel.path[0].y), 20))
-
         # Drawing check
         if e.type == pygame.MOUSEBUTTONDOWN and drowOn and rect.collidepoint(e.pos):
             draw_on = True

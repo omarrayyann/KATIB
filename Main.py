@@ -5,14 +5,16 @@ import Config
 import time
 import GameParameters
 
-# Electromagnet Setup
+# Electromagnet Setupq
 force_pin = 18
 magnet1Pin = 23
 magnet2Pin = 24
 
 # Setting up screen
 pygame.init()
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+# screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((1600, 900))
+
 (screen_width, screen_height) = pygame.display.get_surface().get_size()
 boundaries_x = 150
 boundaries_y = 150
@@ -103,7 +105,7 @@ menus = [start_menu, games_menu, settings_menu]
 
 def apply_brightness():
     global screen, screen_height, screen_width, opacity
-    s = pygame.Surface((screen_width, screen_height) , pygame.SRCALPHA)
+    s = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
     s.fill((0, 0, 0, opacity))
     screen.blit(s, (0, 0))
 
