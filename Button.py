@@ -37,6 +37,8 @@ class Button:
             self.rect_clrs = imgs_or_colors
             self.rect = pygame.Rect(0, 0, size[0], size[1])
         self.rect.center = center
+        self.corner_radius = 3
+        self.font = pygame.font.Font('freesansbold.ttf', self.font_size)
 
     # Resizing the image and/or text
     def resize(self, new_img_size, new_font_size):
@@ -45,6 +47,12 @@ class Button:
         self.rect = self.img.get_rect()
         self.rect.center = self.center
         self.font_size = new_font_size
+
+    def set_corner_radius(self, radius):
+        self.corner_radius = radius
+
+    def set_font(self, font):
+        self.font = font
 
     def move(self, new_center):
         self.center = new_center
@@ -67,12 +75,11 @@ class Button:
             else:
                 screen.blit(self.img, self.rect)
         elif self.btn_type == 'rect':
-            pygame.draw.rect(screen, self.rect_clrs[self.mode_index], self.rect, 0, 3)
+            pygame.draw.rect(screen, self.rect_clrs[self.mode_index], self.rect, 0, self.corner_radius)
         if self.show_txt:
-            font = pygame.font.Font('freesansbold.ttf', self.font_size)
-            text = font.render(self.txt, True, self.font_clrs[0])
+            text = self.font.render(self.txt, True, self.font_clrs[0])
             if self.btn_type == 'rect':
-                text = font.render(self.txt, True, self.font_clrs[self.mode_index])
+                text = self.font.render(self.txt, True, self.font_clrs[self.mode_index])
             text_rect = text.get_rect()
             text_rect.center = self.rect.center
             if self.btn_type == 'img':
