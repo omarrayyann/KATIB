@@ -11,6 +11,7 @@ magnet1Pin = 23
 magnet2Pin = 24
 
 # Setting up screen
+
 pygame.init()
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 (screen_width, screen_height) = pygame.display.get_surface().get_size()
