@@ -2,12 +2,13 @@ import pygame
 import InputBox
 import Button
 import User
+import Config
 
 nested = True
 if not nested:
     pygame.init()
-# screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-screen = pygame.display.set_mode((1600, 900))
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+# screen = pygame.display.set_mode((1600, 900))
 (screen_width, screen_height) = pygame.display.get_surface().get_size()
 background = pygame.image.load("background2.png")
 

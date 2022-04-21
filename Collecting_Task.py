@@ -27,9 +27,9 @@ class Camel:
         self.started = False
 
 
-nested = True
-# screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-screen = pygame.display.set_mode((1600, 900))
+nested = False
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+# screen = pygame.display.set_mode((1600, 900))
 draw_on = False
 drowOn = False
 radius = 10
@@ -117,7 +117,8 @@ def generate_path(from_point, degree):
                 x3_intergral = (1/(4*A))*((2*A*x3+B)*(1+(2*A*x3+B))
                                           ** 0.5+numpy.log(2*A*x3+B+(1+(2*A*x3+B)**2)*0.5))
                 distance = abs(x3_intergral - x1_intergral)
-                n = int(distance/6)
+                n = int(distance/2.5)
+                # n = 75
                 x_step_size = domain/n
 
                 for i in range(n):
@@ -205,8 +206,11 @@ def setup_screen():
             pygame.draw.circle(screen, (199, 199, 199, 0.5),
                                (camel.path[len(camel.path)-1].x, camel.path[len(camel.path)-1].y), 10)
             camel.drawn_point = camel.point
-        screen.blit(sheep_image, (camel.point.x - 50,
-                                  camel.point.y - 50))
+        # screen.blit(sheep_image, (camel.point.x - 50,
+        #                           camel.point.y - 50))
+        pygame.draw.circle(screen, (0, 0, 199, 0.5), (camel.point.x, camel.point.y), 20)               
+            
+
 
 
 def genreating_sheep():
@@ -220,45 +224,46 @@ def genreating_sheep():
 
         if (x_random-screen_width/2)**2 + (y_random-screen_height/2)**2 > outside_radius**2:
             camels = [Camel(Point(x_random, y_random))]
+if not nested:
+    print(" ")
+    # gSer.flush()
+    # print(gSer.readline())
+    # print(gSer.readline())
+    # time.sleep(1)
+    # gSer.write(str.encode('$X\n'))
+    # gSer.write(str.encode('M3 S100\n'))
+    # gSer.write(str.encode('M3 S600\n'))
+    # gSer.write(str.encode('$H\n'))
 
-# gSer.flush()
-# print(gSer.readline())
-# print(gSer.readline())
-# time.sleep(1)
-# gSer.write(str.encode('$X\n'))
-# gSer.write(str.encode('M3 S100\n'))
-# gSer.write(str.encode('M3 S500\n'))
-# gSer.write(str.encode('$H\n'))
+    # time.sleep(5)
 
-# time.sleep(5)
-
-# gSer.write(str.encode('$X\n'))
-# gSer.write(str.encode('M3 S500\n'))
-# time.sleep(1)
-# gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
-# print(gSer.readline())
-# time.sleep(0.1)
-# gSer.write(str.encode('G21 X25  Y-10 F4000\n'))
-# print(gSer.readline())
-# time.sleep(0.1)
-# gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
-# print(gSer.readline())
-# time.sleep(2)
-# gSer.write(str.encode('$X\n'))
-# print(gSer.readline())
-# gSer.write(str.encode('M3 S1000\n'))
-# print(gSer.readline())
-# gSer.write(str.encode(' G21 X0 Y-154 F4000\n'))
-# print(gSer.readline())
-# gSer.write(str.encode('$X\n'))
-# gSer.write(str.encode(' G21 X250 Y-154 F4000\n'))
-# print(gSer.readline())
-# gSer.write(str.encode('$X\n'))
-# gSer.write(str.encode(' G21 X0 Y0 F4000\n'))
-# print(gSer.readline())
-# gSer.write(str.encode('$X\n'))
-# gSer.write(str.encode('M3 S1000\n'))
-# time.sleep(2)
+    # gSer.write(str.encode('$X\n'))
+    # gSer.write(str.encode('M3 S600\n'))
+    # time.sleep(1)
+    # gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
+    # print(gSer.readline())
+    # time.sleep(0.1)
+    # gSer.write(str.encode('G21 X25  Y-10 F4000\n'))
+    # print(gSer.readline())
+    # time.sleep(0.1)
+    # gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
+    # print(gSer.readline())
+    # time.sleep(2)
+    # gSer.write(str.encode('$X\n'))
+    # print(gSer.readline())
+    # gSer.write(str.encode('M3 S1000\n'))
+    # print(gSer.readline())
+    # gSer.write(str.encode(' G21 X0 Y-154 F4000\n'))
+    # print(gSer.readline())
+    # gSer.write(str.encode('$X\n'))
+    # gSer.write(str.encode(' G21 X250 Y-154 F4000\n'))
+    # print(gSer.readline())
+    # gSer.write(str.encode('$X\n'))
+    # gSer.write(str.encode(' G21 X0 Y0 F4000\n'))
+    # print(gSer.readline())
+    # gSer.write(str.encode('$X\n'))
+    # gSer.write(str.encode('M3 S1000\n'))
+    # time.sleep(2)
 
 
 opacity = 255 - GameParameters.GameParameters.brightness
@@ -280,9 +285,9 @@ while working:
         genreating_sheep()
         drowOn = True
         for camel in camels:
-            new_points.append(pygame.draw.circle(
-                screen, (0, 0, 0), (camel.path[0].x, camel.path[0].y), 20))
-
+            new_points.append(
+                pygame.Rect(camel.path[0].x-30, camel.path[0].y-30, 60, 60))
+               
     setup_screen()
 
     screen.blit(startL, rectStart)
@@ -322,26 +327,20 @@ while working:
                 camels[current].point = camels[current].path[0]
                 x_magnet = xp0
                 y_magnet = yp0
-                pygame.display.update()
                 xc, yc = getCoords(xp0, yp0)
                 print("pixels x %f , y %f", (xp0, yp0))
                 print(xc, yc)
-                # (thL,thR)=invKin(xc,yc)
-                # gcodeString = "G21 X" + \
-                #     "{:.3f}".format(xc)+" Y"+"{:.3f}".format(yc)+" F4000\n"
-                # print(gcodeString)
+                gcodeString = "G21 X" + \
+                    "{:.3f}".format(xc)+" Y"+"{:.3f}".format(yc)+" F4000\n"
+                print(gcodeString)
                 # gSer.write(str.encode(gcodeString))
-                # print 'xp: '+str(xp0)+'yp: '+str(yp0)+'xc: '+str(xc)+'yc: '+str(yc)
-                # thL=-90+thL
-                # thR=90+thR
-                # print str(thL)+' '+str(thR)
+             
 
                 #################SEND GCODE COMMANDS###################################
 
                 time.sleep(0.002)
 
-                new_points[current] = pygame.draw.circle(
-                    screen, (0, 0, 255), (xp0, yp0), 30)
+                new_points[current] =  pygame.Rect(xp0-30, yp0-30, 60, 60)
                 pygame.display.flip()
                 time.sleep(0.002)
 

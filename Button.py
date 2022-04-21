@@ -24,7 +24,7 @@ class Button:
             i = 0
             for img_src in self.imgs:
                 img = pygame.image.load(img_src).convert_alpha()
-                img = pygame.transform.scale(img, (self.size, self.size))
+                img = pygame.transform.scale(img, (self.size[0], self.size[1]))
                 self.imgs.pop(i)
                 self.imgs.insert(i, img)
                 dark = pygame.Surface(img.get_size(), flags=pygame.SRCALPHA)
@@ -43,7 +43,7 @@ class Button:
     # Resizing the image and/or text
     def resize(self, new_img_size, new_font_size):
         self.size = new_img_size
-        self.img = pygame.transform.scale(self.img, (self.size, self.size))
+        self.img = pygame.transform.scale(self.img, (self.size[0], self.size[1]))
         self.rect = self.img.get_rect()
         self.rect.center = self.center
         self.font_size = new_font_size
@@ -83,7 +83,7 @@ class Button:
             text_rect = text.get_rect()
             text_rect.center = self.rect.center
             if self.btn_type == 'img':
-                text_rect.top = self.rect.top + self.size + 5
+                text_rect.top = self.rect.top + self.size[1] + 5
             screen.blit(text, text_rect)
 
     def hover_mode(self):

@@ -53,31 +53,31 @@ bg = pygame.image.load("bbg.jpg")
 # Creating buttons
 buttons = []
 # Clear Button
-clear_btn = Button.Button('img', ['clear.png'], 50, 'Clear', True, 20, [(255, 255, 255)],
+clear_btn = Button.Button('img', ['clear.png'], (50, 50), 'Clear', True, 20, [(255, 255, 255)],
                           (screen_width * (4 / 5) + (1 / 2) * (1 - (4 / 5)) * screen_width, 70))
 buttons.append(clear_btn)
 
 # New/Next Maze Button
-new_btn = Button.Button('img', ['addedit.png', 'play.png'], 50, 'New Maze', True, 20, [(255, 255, 255)],
+new_btn = Button.Button('img', ['addedit.png', 'play.png'], (50, 50), 'New Maze', True, 20, [(255, 255, 255)],
                         (screen_width * (4 / 5) + (1 / 2) * (1 - (4 / 5)) * screen_width, 200))
 buttons.append(new_btn)
 
 # Previous maze button
-prev_btn = Button.Button('img', ['start.png'], 50, 'Prev Maze', True, 20, [(255, 255, 255)],
+prev_btn = Button.Button('img', ['start.png'], (50, 50), 'Prev Maze', True, 20, [(255, 255, 255)],
                          (screen_width * (4 / 5) + (1 / 2) * (1 - (4 / 5)) * screen_width, 330))
 buttons.append(prev_btn)
 
 # Show/Hide Solution Button
-sol_btn = Button.Button('img', ['openeye.png', 'closedeye.png'], 50, 'Show Solution', True, 20, [(255, 255, 255)],
+sol_btn = Button.Button('img', ['openeye.png', 'closedeye.png'], (50, 50), 'Show Solution', True, 20, [(255, 255, 255)],
                         (screen_width * (4 / 5) + (1 / 2) * (1 - (4 / 5)) * screen_width, 460))
 buttons.append(sol_btn)
 
 # Save Button
-save_btn = Button.Button('img', ['save.png'], 50, 'Show Solution', True, 20, [(255, 255, 255)],
+save_btn = Button.Button('img', ['save.png'], (50, 50), 'Show Solution', True, 20, [(255, 255, 255)],
                          (screen_width * (4 / 5) + (1 / 2) * (1 - (4 / 5)) * screen_width, 590))
 buttons.append(save_btn)
 
-prev_menu_btn = Button.Button('img', ['go-back-arrow.png'], 50, 'Prev', False, 50, [(0, 0, 0)],
+prev_menu_btn = Button.Button('img', ['go-back-arrow.png'], (50, 50), 'Prev', False, 50, [(0, 0, 0)],
                               (screen_width / 15, screen_height / 9))
 
 exit_game = pygame.image.load('exit.png')

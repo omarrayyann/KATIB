@@ -8,7 +8,7 @@ import string
 # import serial
 
 # Setting up game variables:
-nested = True
+nested = False
 volume = GameParameters.GameParameters.volume
 opacity = 255 - GameParameters.GameParameters.brightness
 mode = 'letter'
@@ -86,27 +86,26 @@ bg = pygame.image.load("bbg.jpg")
 
 # Creating Buttons
 # Previous menu/exit button
-prev_menu_btn = Button.Button('img', ['go-back-arrow.png'], 50, 'Prev', False, 50, [(0, 0, 0)],
-                              (screen_width / 15, screen_height / 9))
+prev_menu_btn = Button.Button('img', ['go-back-arrow.png'], (50, 50), 'Prev', False, 50, [(0, 0, 0)], (screen_width / 15, screen_height / 9))
 
 buttons = []
 # Clear Button
-clear_btn = Button.Button('img', ['clear.png'], 50, 'Clear', False, 20, [(255, 255, 255)],
+clear_btn = Button.Button('img', ['clear.png'], (50, 50), 'Clear', False, 20, [(255, 255, 255)],
                           (0, 0))
 buttons.append(clear_btn)
 
 # Previous maze button
-prev_btn = Button.Button('img', ['start.png'], 50, 'Prev', False, 20, [(255, 255, 255)],
+prev_btn = Button.Button('img', ['start.png'], (50, 50), 'Prev', False, 20, [(255, 255, 255)],
                          (0, 0))
 buttons.append(prev_btn)
 
 # New/Next Maze Button
-new_btn = Button.Button('img', ['play.png'], 50, 'Next', False, 20, [(255, 255, 255)],
+new_btn = Button.Button('img', ['play.png'], (50, 50), 'Next', False, 20, [(255, 255, 255)],
                         (0, 0))
 buttons.append(new_btn)
 
 # Show/Hide Solution Button
-sol_btn = Button.Button('img', ['openeye.png', 'closedeye.png'], 50, 'Show Solution', False, 20, [(255, 255, 255)],
+sol_btn = Button.Button('img', ['openeye.png', 'closedeye.png'], (50, 50), 'Show Solution', False, 20, [(255, 255, 255)],
                         (0, 0))
 buttons.append(sol_btn)
 
