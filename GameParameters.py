@@ -19,12 +19,12 @@ def set_volume(new_volume):
 
 class GameParameters:
     volume = 10
-    brightness = 200
+    brightness = 255
     max_brightness = 255
     max_volume = 100
 
     # Default settings:
     default_volume = 50
-    default_brightness = 200
+    default_brightness = 255
 
 
