@@ -33,7 +33,7 @@ opacity = 255 - GameParameters.GameParameters.brightness
 current_menu = 0
 prev_menu_stack = []
 calibrated = False
-on_katib = True
+on_katib = False
 
 # Design Variables:
 padding = 20
@@ -88,7 +88,6 @@ for i in range(len(games_menu)):
 # Grouping all menus
 menus = [start_menu, games_menu, settings_menu]
 
-
 def apply_brightness():
     global screen, screen_height, screen_width, opacity
     s = pygame.Surface((1600, 900), pygame.SRCALPHA)
@@ -107,55 +106,57 @@ def switch_to_menu(new_menu):
 def calibrate():
     # S 600 with the Gerbel protocol.
     # Calibrate
-    global gSer
-    gSer = serial.Serial('/dev/ttyACM0', '115200')
-    time.sleep(3)
-    gSer.flush()
-    gSer.flush()
-    print(gSer.readline())
-    print(gSer.readline())
-    time.sleep(1)
-    gSer.write(str.encode('$X\n'))
-    gSer.write(str.encode('M3 S100\n'))
-    gSer.write(str.encode('M3 S600\n'))
-    gSer.write(str.encode('$H\n'))
+    if on_katib:
+        global gSer
+        gSer = serial.Serial('/dev/ttyACM0', '115200')
+        time.sleep(3)
+        gSer.flush()
+        gSer.flush()
+        print(gSer.readline())
+        print(gSer.readline())
+        time.sleep(1)
+        gSer.write(str.encode('$X\n'))
+        gSer.write(str.encode('M3 S100\n'))
+        gSer.write(str.encode('M3 S600\n'))
+        gSer.write(str.encode('$H\n'))
 
-    time.sleep(5)
+        time.sleep(5)
 
-    gSer.write(str.encode('$X\n'))
-    gSer.write(str.encode('M3 S600\n'))
-    time.sleep(1)
-    gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
-    print(gSer.readline())
-    time.sleep(0.1)
-    gSer.write(str.encode('G21 X25  Y-10 F4000\n'))
-    print(gSer.readline())
-    time.sleep(0.1)
-    gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
-    print(gSer.readline())
-    time.sleep(2)
-    gSer.write(str.encode('$X\n'))
-    print(gSer.readline())
-    gSer.write(str.encode('M3 S1000\n'))
-    print(gSer.readline())
-    gSer.write(str.encode(' G21 X0 Y-154 F4000\n'))
-    print(gSer.readline())
-    gSer.write(str.encode('$X\n'))
-    gSer.write(str.encode(' G21 X250 Y-154 F4000\n'))
-    print(gSer.readline())
-    gSer.write(str.encode('$X\n'))
-    gSer.write(str.encode(' G21 X0 Y0 F4000\n'))
-    print(gSer.readline())
-    gSer.write(str.encode('$X\n'))
-    gSer.write(str.encode('M3 S1000\n'))
+        gSer.write(str.encode('$X\n'))
+        gSer.write(str.encode('M3 S600\n'))
+        time.sleep(1)
+        gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
+        print(gSer.readline())
+        time.sleep(0.1)
+        gSer.write(str.encode('G21 X25  Y-10 F4000\n'))
+        print(gSer.readline())
+        time.sleep(0.1)
+        gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
+        print(gSer.readline())
+        time.sleep(2)
+        gSer.write(str.encode('$X\n'))
+        print(gSer.readline())
+        gSer.write(str.encode('M3 S1000\n'))
+        print(gSer.readline())
+        gSer.write(str.encode(' G21 X0 Y-154 F4000\n'))
+        print(gSer.readline())
+        gSer.write(str.encode('$X\n'))
+        gSer.write(str.encode(' G21 X250 Y-154 F4000\n'))
+        print(gSer.readline())
+        gSer.write(str.encode('$X\n'))
+        gSer.write(str.encode(' G21 X0 Y0 F4000\n'))
+        print(gSer.readline())
+        gSer.write(str.encode('$X\n'))
+        gSer.write(str.encode('M3 S1000\n'))
     time.sleep(2)
     global calibrated
     calibrated = True
     # Confirmation
     print('Calibrated Katib device... Ready for commands')
-    pygame.mixer.init()  # Initialize the mixer module.
-    sound1 = pygame.mixer.Sound('success.mp3')  # Load a sound.
 
+screen.blit(loading, (0, 0))
+pygame.display.flip()
+calibrate()
 
 try:
     while Config.signed_in:
@@ -182,11 +183,7 @@ try:
                     raise StopIteration
                 if current_menu == 0:
                     if start_menu[0].rect.collidepoint(e.pos):
-                        if on_katib:
-                            screen.blit(loading, (0,0))
-                            pygame.display.flip()
-                            calibrate()
-                        if calibrated:
+                        if not on_katib or calibrated:
                             exec(open('Select_Game_Menu.py').read())
                         else:
                             print('error')

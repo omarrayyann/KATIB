@@ -13,19 +13,20 @@ background = pygame.image.load("pickgame.png")
 
 run = True
 
-
-# Rects
-collect_btn = Button.Button('img', ['catch_sheep.png'], (456, 225), '', False, 50, [(255, 255, 255)], (820, 303))
-# maze_rect = pygame.Rect(820, 303, 456, 225)
-collect_rect = pygame.Rect(324, 303, 456, 225)
-handwriting_rect = pygame.Rect(324, 568, 952, 225)
-
+# Buttons
+prev_menu_btn = Button.Button('img', ['go-back-arrow.png'], (50, 50), 'Prev', False, 50, [(0, 0, 0)],
+                              (screen_width / 15, screen_height / 9))
+collect_btn = Button.Button('img', ['catch_sheep.png'], (456, 225), '', False, 50, [(255, 255, 255)], (324 + (456/2), 303 + 225/2))
+maze_btn = Button.Button('img', ['Maze_button.png'], (456, 225), '', False, 50, [(255, 255, 255)], (820 + (456/2), 303 + 225/2))
+handwriting_btn = Button.Button('img', ['Writing_button.png'], (952, 225), '', False, 50, [(255, 255, 255)], (324 + (952/2), 568 + 225/2))
+game_btns = [collect_btn, maze_btn, handwriting_btn]
 
 def setup_screen():
-    global screen, start_btn
+    global screen, game_btns
     screen.blit(background, (0, 0))
-    collect_btn.draw_button()
-
+    for button in game_btns:
+        button.draw_button(screen)
+    prev_menu_btn.draw_button(screen)
 
 while run:
     setup_screen()
@@ -34,11 +35,13 @@ while run:
             if e.key == pygame.K_q:
                 run = False
         if e.type == pygame.MOUSEBUTTONDOWN:
+            if prev_menu_btn.rect.collidepoint(e.pos):
+                raise StopIteration
             if collect_btn.rect.collidepoint(e.pos):
                 exec(open('PreMaze.py').read())
-            elif collect_rect.collidepoint(e.pos):
+            elif collect_btn.rect.collidepoint(e.pos):
                 exec(open('Collecting_Task.py').read())
-            elif handwriting_rect.collidepoint(e.pos):
+            elif handwriting_btn.rect.collidepoint(e.pos):
                 exec(open('Writing_Task.py').read())
 
     pygame.display.flip()
