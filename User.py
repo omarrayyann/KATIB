@@ -4,7 +4,8 @@
 class User:
 
     # Constructor
-    def __init__(self, username):
+    def __init__(self, username, password):
         self.username = username
+        self.password = password
 
 

@@ -30,10 +30,10 @@ if not nested:
     (screen_width, screen_height) = pygame.display.get_surface().get_size()
     boundaries_x = 150
     boundaries_y = 150
-    xl = screen_width - (boundaries_x * 2)
-    xs = boundaries_x
-    yl = screen_height - (boundaries_y * 2)
-    ys = boundaries_y
+    x_length = screen_width - (boundaries_x * 2)
+    x_size = boundaries_x
+    y_length = screen_height - (boundaries_y * 2)
+    y_size = boundaries_y
 
 pygame.display.set_caption('Maze Serious Game')
 bg_color = (0, 0, 0)
@@ -104,19 +104,18 @@ def inv_kin(x_in, y_in):
     return 90.0 + thetaR, -90.0 + thetaL
 
 
-def get_coords(xn, yn):
-    global xs, xl, ys, yl
-    if xn < xs + xl and xn >= xs:
-        xn = (xn - xs) / xl
+def getCoords(xn, yn):
+    print(" xN: ", xn, " yN: ", yn)
+    if xn < x_size +x_length and xn >= x_size:
+        xn = (xn-x_size)/x_length
     else:
         return
-    if yn < ys + yl and yn >= ys:
-        yn = (yn - ys) / yl
+    if yn < y_size +y_length and yn >= y_size:
+        yn = (yn-y_size)/y_length
     else:
         return
-    fx = 143 * xn
-    # fy= 0.00017125*yn+0.09431875
-    fy = -95 * yn
+    fx = 305*xn
+    fy = -140*yn
     return fx, fy
 
 

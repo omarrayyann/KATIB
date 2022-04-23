@@ -1,4 +1,6 @@
 import pygame
+
+import Data
 import InputBox
 import Button
 import User
@@ -73,8 +75,6 @@ def clicked_start():
     global error, run, error_text
     if Config.log_in(username_field.text, password_field.text):
         print("success logging in")
-        Config.current_user = User.User(username_field.text)
-        Config.signed_in = True
         run = False
 
     else:
@@ -95,6 +95,8 @@ while run:
                     if field.active:
                         active = True
                 run = active
+                if not run:
+                    raise StopIteration
         if e.type == pygame.MOUSEBUTTONDOWN and (username_field.rect.collidepoint(e.pos) or password_field.rect.collidepoint(e.pos)):
             error = False
         if e.type == pygame.MOUSEBUTTONDOWN and start_btn.rect.collidepoint(e.pos):

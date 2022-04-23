@@ -1,5 +1,4 @@
 import User
 
-current_user = User.User("non")
 
-sign_in_detals = ["omar", "123"]
+sign_in_detals = [User.User("omar", "123"), User.User("dhiyaa", "123")]

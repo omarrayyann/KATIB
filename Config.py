@@ -1,15 +1,22 @@
 import User
 import Data
 
-current_user = User.User("non")
-current_status = "logged_out"
+current_user = ''
 signed_in = False
 
 
-def log_in(username,password):
+def log_in(username, password):
     # Verifying
-    if username==Data.sign_in_detals[0] and password==Data.sign_in_detals[1]:
-        #Success
-        return True
-    else:
-        return False
+    for i in range(len(Data.sign_in_detals)):
+        if username == Data.sign_in_detals[i].username and password == Data.sign_in_detals[i].password:
+            #Success
+            global current_user, signed_in
+            current_user = Data.sign_in_detals[i]
+            signed_in = True
+            return True
+    return False
+
+def log_out():
+    global current_user, signed_in
+    current_user = ''
+    signed_in = False
