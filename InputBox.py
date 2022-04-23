@@ -22,6 +22,7 @@ class InputBox:
         self.secure = False
         self.cursor_show = False
         self.place_holder_text = place_holder_text
+        self.box_list = []
 
     def get_text(self):
         return self.text
@@ -40,13 +41,10 @@ class InputBox:
             else:
                 self.cursor_show = False
                 self.active = False
-            # Change the current color of the input box.
-            self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
         if event.type == pygame.KEYDOWN:
             if self.active:
                 if event.key == pygame.K_RETURN:
-                    print(self.text)
-                    self.text = ''
+                    self.move_to_next_box()
                 elif event.key == pygame.K_BACKSPACE:
                     self.text = self.text[:-1]
                     self.cursor_show = True
@@ -56,16 +54,22 @@ class InputBox:
                     self.text += event.unicode
                     # print(self.text)
                 # Re-render the text.
+        # Change the current color of the input box.
+        self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
         if self.secure:
             self.txt_surface = FONT.render("*" * (len(self.text)), True, self.color)
         else:
             self.txt_surface = FONT.render(self.text, True, self.color)
 
 
-    # def update(self):
-    #     # Resize the box if the text is too long.
-    #     width = max(200, self.txt_surface.get_width()+10)
-    #     self.rect.w = width
+    def move_to_next_box(self):
+        index = self.box_list.index(self)
+        if index < len(self.box_list) - 1:
+            self.cursor_show = False
+            self.active = False
+            self.box_list[index + 1].active = True
+            self.box_list[index + 1].cursor_show = True
+
 
     def draw(self, screen):
         # Blit the text.

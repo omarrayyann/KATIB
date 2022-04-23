@@ -4,7 +4,7 @@ import DrawArea
 import math
 import Maze
 import GameParameters
-# import serial
+import serial
 
 # Initializing pygame
 
@@ -17,6 +17,7 @@ volume = GameParameters.GameParameters.volume
 opacity = 255 - GameParameters.GameParameters.brightness
 show = False
 skip = False
+haptic_on = True
 
 # Electromagnet Setup
 force_pin = 18
@@ -53,29 +54,34 @@ bg = pygame.image.load("bbg.jpg")
 # Creating buttons
 buttons = []
 # Clear Button
-clear_btn = Button.Button('img', ['clear.png'], (50, 50), 'Clear', True, 20, [(255, 255, 255)],
-                          (screen_width * (4 / 5) + (1 / 2) * (1 - (4 / 5)) * screen_width, 70))
+clear_btn = Button.Button('img', ['clear.png'], (50, 50), 'Clear', False, 20, [(255, 255, 255)],
+                          (screen_width * (5 / 6) + (1 / 2) * (1 - (5 / 6)) * screen_width, 70))
 buttons.append(clear_btn)
 
 # New/Next Maze Button
-new_btn = Button.Button('img', ['addedit.png', 'play.png'], (50, 50), 'New Maze', True, 20, [(255, 255, 255)],
-                        (screen_width * (4 / 5) + (1 / 2) * (1 - (4 / 5)) * screen_width, 200))
+new_btn = Button.Button('img', ['addedit.png', 'play.png'], (50, 50), 'New Maze', False, 20, [(255, 255, 255)],
+                        (screen_width * (5 / 6) + (1 / 2) * (1 - (5 / 6)) * screen_width, 200))
 buttons.append(new_btn)
 
 # Previous maze button
-prev_btn = Button.Button('img', ['start.png'], (50, 50), 'Prev Maze', True, 20, [(255, 255, 255)],
-                         (screen_width * (4 / 5) + (1 / 2) * (1 - (4 / 5)) * screen_width, 330))
+prev_btn = Button.Button('img', ['start.png'], (50, 50), 'Prev Maze', False, 20, [(255, 255, 255)],
+                         (screen_width * (5 / 6) + (1 / 2) * (1 - (5 / 6)) * screen_width, 330))
 buttons.append(prev_btn)
 
 # Show/Hide Solution Button
-sol_btn = Button.Button('img', ['openeye.png', 'closedeye.png'], (50, 50), 'Show Solution', True, 20, [(255, 255, 255)],
-                        (screen_width * (4 / 5) + (1 / 2) * (1 - (4 / 5)) * screen_width, 460))
+sol_btn = Button.Button('img', ['openeye.png', 'closedeye.png'], (50, 50), 'Show Solution', False, 20, [(255, 255, 255)],
+                        (screen_width * (5 / 6) + (1 / 2) * (1 - (5 / 6)) * screen_width, 460))
 buttons.append(sol_btn)
 
 # Save Button
-save_btn = Button.Button('img', ['save.png'], (50, 50), 'Show Solution', True, 20, [(255, 255, 255)],
-                         (screen_width * (4 / 5) + (1 / 2) * (1 - (4 / 5)) * screen_width, 590))
+save_btn = Button.Button('img', ['save.png'], (50, 50), 'Save Data', False, 20, [(255, 255, 255)],
+                         (screen_width * (5 / 6) + (1 / 2) * (1 - (5 / 6)) * screen_width, 590))
 buttons.append(save_btn)
+
+# Haptic on_off
+haptic_toggle = Button.Button('img', ['openeye.png', 'closedeye.png'], (50, 50), 'Toggle Haptic', True, 20, [(255, 255, 255)],
+                         (screen_width * (5 / 6) + (1 / 2) * (1 - (5 / 6)) * screen_width, 720))
+buttons.append(haptic_toggle)
 
 prev_menu_btn = Button.Button('img', ['go-back-arrow.png'], (50, 50), 'Prev', False, 50, [(0, 0, 0)],
                               (screen_width / 15, screen_height / 9))
@@ -120,9 +126,9 @@ def getCoords(xn, yn):
 
 
 def create_maze(maze_w):
-    global xl, yl
-    draw_width = int(xl / maze_w) * maze_w
-    draw_height = int(yl / maze_w) * maze_w
+    global x_length, y_length
+    draw_width = int(x_length / maze_w) * maze_w
+    draw_height = int(y_length / maze_w) * maze_w
     w = maze_w
     maze = Maze.Maze(w, draw_width, draw_height)
     return maze
@@ -139,7 +145,8 @@ def create_draw_area(draw_width, draw_height):
 def draw_magnet():
     global screen, sheep, magnet_point
     magnet_point.center = mazes[current].katib_points[mazes[current].current_point]
-    screen.blit(sheep, magnet_point)
+    if mazes[current].current_point != len(mazes[current].katib_points) - 1:
+        screen.blit(sheep, magnet_point)
 
 
 def apply_brightness():
@@ -165,6 +172,12 @@ try:
         else:
             buttons[3].switch_img(1)
             buttons[3].txt = 'Show Solution'
+        if haptic_on:
+            buttons[5].switch_img(0)
+            buttons[5].txt = 'ON'
+        else:
+            buttons[5].switch_img(1)
+            buttons[5].txt = 'OFF'
         if current != -1:
             mazes[current].draw_maze(screen, (255, 255, 255), start_pos[0], start_pos[1], skip, show)
             if not mazes[current].drawn:
@@ -194,12 +207,8 @@ try:
                 raise StopIteration
             if current != -1:
                 if e.type == pygame.MOUSEBUTTONDOWN:
-                    if draw_areas[current].canvas.collidepoint(e.pos) and not mazes[
-                        current].drawn:
+                    if draw_areas[current].canvas.collidepoint(e.pos) and not mazes[current].drawn:
                         skip = True
-                    # elif draw_areas[current].canvas.collidepoint(e.pos) and mazes[
-                    #     current].drawn:
-                    #     draw_areas[current].drawing = True
                     elif buttons[0].rect.collidepoint(e.pos):
                         draw_areas[current].clear_area()
                         mazes[current].current_point = 0
@@ -210,12 +219,25 @@ try:
                     elif buttons[4].rect.collidepoint(e.pos) and mazes[
                         current].saved:
                         mazes[current].save_maze(screen, start_pos[0], start_pos[1])
+                    elif buttons[5].rect.collidepoint(e.pos):
+                        haptic_on = not haptic_on
                 elif not pygame.mouse.get_pressed()[0]:
                     draw_areas[current].toggle_interaction(True)
                 if draw_areas[current].drawing:
                     # Move to next point
                     if magnet_point.collidepoint(pygame.mouse.get_pos()) and mazes[current].current_point != len(mazes[current].katib_points) - 1:
                         mazes[current].current_point += 1
+                        xp0, yp0 = mazes[current].katib_points[mazes[current].current_point]
+                        x_magnet = xp0
+                        y_magnet = yp0
+                        xc, yc = getCoords(xp0, yp0)
+                        print("pixels x %f , y %f", (xp0, yp0))
+                        print(xc, yc)
+                        gcodeString = "G21 X" + \
+                                      "{:.3f}".format(xc) + " Y" + "{:.3f}".format(yc) + " F4000\n"
+                        print(gcodeString)
+                        if nested and haptic_on and on_katib:
+                            gSer.write(str.encode(gcodeString))
                     (j, i) = (int((pygame.mouse.get_pos()[0] - start_pos[0]) / mazes[current].w),
                               int((pygame.mouse.get_pos()[1] - start_pos[1]) / mazes[current].w))
                     if draw_areas[current].canvas.collidepoint(pygame.mouse.get_pos()):
