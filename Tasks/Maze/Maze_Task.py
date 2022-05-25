@@ -4,6 +4,9 @@ from Tasks.Shared import DrawArea
 import math
 from Tasks.Maze.Supporting_Classes import Maze
 import GameParameters
+import os
+import serial
+import time
 
 # import serial
 
@@ -13,12 +16,13 @@ fpsClock = pygame.time.Clock()
 FPS = 100
 
 # Setting up game variables:
-nested = True
+nested = False
 volume = GameParameters.GameParameters.volume
 opacity = 255 - GameParameters.GameParameters.brightness
 show = False
 skip = False
-haptic_on = False
+haptic_on = True
+gSer = 0
 
 # Electromagnet Setup
 force_pin = 18
@@ -27,9 +31,53 @@ magnet2Pin = 24
 
 # Screen Setup
 if not nested:
-    on_katib = False
+    on_katib = True
     pygame.init()
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    os.chdir('../../')
+    if on_katib:
+        if on_katib:
+            global gSer
+            gSer = serial.Serial('/dev/ttyACM0', '115200')
+            time.sleep(3)
+            gSer.flush()
+            gSer.flush()
+            print(gSer.readline())
+            print(gSer.readline())
+            time.sleep(1)
+            gSer.write(str.encode('$X\n'))
+            gSer.write(str.encode('M3 S100\n'))
+            gSer.write(str.encode('M3 S600\n'))
+            gSer.write(str.encode('$H\n'))
+
+            time.sleep(5)
+
+            gSer.write(str.encode('$X\n'))
+            gSer.write(str.encode('M3 S600\n'))
+            time.sleep(1)
+            gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
+            print(gSer.readline())
+            time.sleep(0.1)
+            gSer.write(str.encode('G21 X25  Y-10 F4000\n'))
+            print(gSer.readline())
+            time.sleep(0.1)
+            gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
+            print(gSer.readline())
+            time.sleep(2)
+            gSer.write(str.encode('$X\n'))
+            print(gSer.readline())
+            gSer.write(str.encode('M3 S1000\n'))
+            print(gSer.readline())
+            gSer.write(str.encode(' G21 X0 Y-154 F4000\n'))
+            print(gSer.readline())
+            gSer.write(str.encode('$X\n'))
+            gSer.write(str.encode(' G21 X250 Y-154 F4000\n'))
+            print(gSer.readline())
+            gSer.write(str.encode('$X\n'))
+            gSer.write(str.encode(' G21 X0 Y0 F4000\n'))
+            print(gSer.readline())
+            gSer.write(str.encode('$X\n'))
+            gSer.write(str.encode('M3 S1000\n'))
 (screen_width, screen_height) = pygame.display.get_surface().get_size()
 boundaries_x = 150
 boundaries_y = 150
@@ -47,7 +95,7 @@ mazes = []
 draw_areas = []
 current = -1
 sheep = pygame.image.load('Media/Images/sheep.png').convert_alpha()
-sheep = pygame.transform.scale(sheep, (50,50))
+sheep = pygame.transform.scale(sheep, (50, 50))
 magnet_point = sheep.get_rect()
 
 # Grass Background
