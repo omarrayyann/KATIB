@@ -7,7 +7,7 @@ if not nested:
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 # screen = pygame.display.set_mode((1600, 900))
 (screen_width, screen_height) = pygame.display.get_surface().get_size()
-background = pygame.image.load("../Media/Backgrounds/pickgame.png")
+background = pygame.image.load("Media/Backgrounds/pickgame.png")
 
 run = True
 
@@ -36,11 +36,11 @@ while run:
             if prev_menu_btn.rect.collidepoint(e.pos):
                 raise StopIteration
             if collect_btn.rect.collidepoint(e.pos):
-                exec(open('../Tasks/Maze/Maze_Task.py').read())
+                exec(open('Tasks/Maze/Maze_Task.py').read())
             elif collect_btn.rect.collidepoint(e.pos):
-                exec(open('../Tasks/Collecting/Collecting_Task.py').read())
+                exec(open('Tasks/Collecting/Collecting_Task.py').read())
             elif handwriting_btn.rect.collidepoint(e.pos):
-                exec(open('../Tasks/Writing/Writing_Task.py').read())
+                exec(open('Tasks/Writing/Writing_Task.py').read())
 
     pygame.display.flip()
 if not nested:

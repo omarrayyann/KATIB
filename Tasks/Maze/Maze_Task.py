@@ -3,7 +3,7 @@ from Input import Button
 from Tasks.Shared import DrawArea
 import math
 from Tasks.Maze.Supporting_Classes import Maze
-from General import GameParameters
+import GameParameters
 
 # import serial
 
@@ -13,7 +13,7 @@ fpsClock = pygame.time.Clock()
 FPS = 100
 
 # Setting up game variables:
-nested = False
+nested = True
 volume = GameParameters.GameParameters.volume
 opacity = 255 - GameParameters.GameParameters.brightness
 show = False
@@ -30,13 +30,13 @@ if not nested:
     on_katib = False
     pygame.init()
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-    (screen_width, screen_height) = pygame.display.get_surface().get_size()
-    boundaries_x = 150
-    boundaries_y = 150
-    x_length = screen_width - (boundaries_x * 2)
-    x_size = boundaries_x
-    y_length = screen_height - (boundaries_y * 2)
-    y_size = boundaries_y
+(screen_width, screen_height) = pygame.display.get_surface().get_size()
+boundaries_x = 150
+boundaries_y = 150
+x_length = screen_width - (boundaries_x * 2)
+x_size = boundaries_x
+y_length = screen_height - (boundaries_y * 2)
+y_size = boundaries_y
 
 pygame.display.set_caption('Maze Serious Game')
 bg_color = (0, 0, 0)
@@ -46,50 +46,50 @@ start_pos = (boundaries_x, boundaries_y)
 mazes = []
 draw_areas = []
 current = -1
-sheep = pygame.image.load('../../Media/Images/sheep.png').convert_alpha()
+sheep = pygame.image.load('Media/Images/sheep.png').convert_alpha()
 sheep = pygame.transform.scale(sheep, (50,50))
 magnet_point = sheep.get_rect()
 
 # Grass Background
-bg = pygame.image.load("../../Media/Backgrounds/bbg.jpg")
+bg = pygame.image.load("Media/Backgrounds/bbg.jpg")
 
 # Creating buttons
 buttons = []
 # Clear Button
-clear_btn = Button.Button('img', ['clear.png'], (50, 50), 'Clear', True, 20, [(255, 255, 255)],
+clear_btn = Button.Button('img', ['Media/Images/clear.png'], (50, 50), 'Clear', True, 20, [(255, 255, 255)],
                           (screen_width * (4 / 5) + (1 / 2) * (1 - (4 / 5)) * screen_width, 70))
 buttons.append(clear_btn)
 
 # New/Next Maze Button
-new_btn = Button.Button('img', ['addedit.png', 'play.png'], (50, 50), 'New Maze', True, 20, [(255, 255, 255)],
+new_btn = Button.Button('img', ['Media/Images/addedit.png', 'Media/Images/play.png'], (50, 50), 'New Maze', True, 20, [(255, 255, 255)],
                         (screen_width * (4 / 5) + (1 / 2) * (1 - (4 / 5)) * screen_width, 200))
 buttons.append(new_btn)
 
 # Previous maze button
-prev_btn = Button.Button('img', ['start.png'], (50, 50), 'Prev Maze', True, 20, [(255, 255, 255)],
+prev_btn = Button.Button('img', ['Media/Images/start.png'], (50, 50), 'Prev Maze', True, 20, [(255, 255, 255)],
                          (screen_width * (4 / 5) + (1 / 2) * (1 - (4 / 5)) * screen_width, 330))
 buttons.append(prev_btn)
 
 # Show/Hide Solution Button
-sol_btn = Button.Button('img', ['openeye.png', 'closedeye.png'], (50, 50), 'Show Solution', True, 20, [(255, 255, 255)],
+sol_btn = Button.Button('img', ['Media/Images/openeye.png', 'Media/Images/closedeye.png'], (50, 50), 'Show Solution', True, 20, [(255, 255, 255)],
                         (screen_width * (4 / 5) + (1 / 2) * (1 - (4 / 5)) * screen_width, 460))
 buttons.append(sol_btn)
 
 # Save Button
-save_btn = Button.Button('img', ['save.png'], (50, 50), 'Show Solution', True, 20, [(255, 255, 255)],
+save_btn = Button.Button('img', ['Media/Images/save.png'], (50, 50), 'Show Solution', True, 20, [(255, 255, 255)],
                          (screen_width * (4 / 5) + (1 / 2) * (1 - (4 / 5)) * screen_width, 590))
 buttons.append(save_btn)
 
 # Haptic on_off
-haptic_toggle = Button.Button('img', ['openeye.png', 'closedeye.png'], (50, 50), 'Toggle Haptic', True, 20, [(255, 255, 255)],
+haptic_toggle = Button.Button('img', ['Media/Images/openeye.png', 'Media/Images/closedeye.png'], (50, 50), 'Toggle Haptic', True, 20, [(255, 255, 255)],
                               (screen_width * (5 / 6) + (1 / 2) * (1 - (5 / 6)) * screen_width, 720))
 buttons.append(haptic_toggle)
 
-prev_menu_btn = Button.Button('img', ['go-back-arrow.png'], (50, 50), 'Prev', False, 50, [(0, 0, 0)],
+prev_menu_btn = Button.Button('img', ['Media/Images/go-back-arrow.png'], (50, 50), 'Prev', False, 50, [(0, 0, 0)],
                               (screen_width / 15, screen_height / 9))
 
-exit_game = pygame.image.load('../../Media/Images/exit.png')
-close = pygame.image.load('../../Media/Images/close.png')
+exit_game = pygame.image.load('Media/Images/exit.png')
+close = pygame.image.load('Media/Images/close.png')
 
 
 def inv_kin(x_in, y_in):

@@ -1,7 +1,7 @@
 import pygame
 
 from Input import Button, InputBox
-import Config
+from Sign_In import Config
 
 nested = True
 if not nested:
@@ -9,12 +9,12 @@ if not nested:
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 # screen = pygame.display.set_mode((1600, 900))
 (screen_width, screen_height) = pygame.display.get_surface().get_size()
-background = pygame.image.load("../Media/Backgrounds/background2.png")
+background = pygame.image.load("Media/Backgrounds/background2.png")
 
 run = True
 
 start_rect = pygame.Rect(504, 661, 592, 76)
-font = pygame.font.Font('Futura-Bold.otf', 36)
+font = pygame.font.Font('Media/Fonts/Futura-Bold.otf', 36)
 start_btn = Button.Button('rect', [(255, 195, 0), (0, 0, 0)], (592, 76), 'START', True, 36,
                           [(0, 0, 0), (255, 195, 0)], (504 + 592/2, 661 + 76/2))
 start_btn.set_corner_radius(int(start_btn.size[1]/2))
@@ -61,7 +61,7 @@ def setup_screen():
     password_field.draw(screen)
     pygame.draw.rect(screen, (0, 0, 0), start_rect, 2, 38)
     if error:
-        font = pygame.font.Font('Futura-Medium.otf', 20)
+        font = pygame.font.Font('Media/Fonts/Futura-Medium.otf', 20)
         error_label = font.render(error_text, True, (150, 0, 0))
         error_label_rect = pygame.Rect(screen_width/2 - error_label.get_width(
         )/2, password_field_y + error_label.get_height()/2 + 85, 0, 0)

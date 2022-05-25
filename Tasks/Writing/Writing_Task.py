@@ -1,5 +1,5 @@
 import pygame
-from General import GameParameters
+import GameParameters
 from Tasks.Shared import DrawArea
 from Input import Button
 import csv
@@ -8,7 +8,7 @@ import string
 # import serial
 
 # Setting up game variables:
-nested = False
+nested = True
 volume = GameParameters.GameParameters.volume
 opacity = 255 - GameParameters.GameParameters.brightness
 mode = 'letter'
@@ -45,8 +45,8 @@ canvas_color = (255, 255, 255)
 draw_area = DrawArea.DrawArea(xl, yl, start_pos, canvas_color)
 
 delim = ' '
-imageDir = 'Arabic/Image'
-letterDir = 'Arabic/Data/'
+imageDir = 'Letters_Data/Arabic/Image'
+letterDir = 'Letters_Data/Arabic/Data/'
 
 d = dict.fromkeys(string.ascii_lowercase, [])
 letterImg = []
@@ -54,7 +54,7 @@ lettersX = []
 lettersY = []
 
 cwd = os.getcwd()
-Data_path = cwd+"/Arabic/Data_converted"
+Data_path = cwd+"/Letters_Data/Arabic/Data_converted"
 letter_paths = os.listdir(Data_path)
 # print(letter_paths)
 for file_name in letter_paths:
@@ -72,7 +72,7 @@ for file_name in letter_paths:
     lettersX.append(x)
     lettersY.append(y)
 
-Data_path = cwd+"/Arabic/Image"
+Data_path = cwd+"/Letters_Data/Arabic/Image"
 letter_paths = os.listdir(Data_path)
 for file_name in letter_paths:
     img = pygame.image.load(Data_path + '/' + file_name).convert_alpha(screen)
@@ -82,30 +82,30 @@ for file_name in letter_paths:
     letterImg.append([img, rect])
 
 # Grass Background
-bg = pygame.image.load("../../Media/Backgrounds/bbg.jpg")
+bg = pygame.image.load("Media/Backgrounds/bbg.jpg")
 
 # Creating Buttons
 # Previous menu/exit button
-prev_menu_btn = Button.Button('img', ['go-back-arrow.png'], (50, 50), 'Prev', False, 50, [(0, 0, 0)], (screen_width / 15, screen_height / 9))
+prev_menu_btn = Button.Button('img', ['Media/Images/go-back-arrow.png'], (50, 50), 'Prev', False, 50, [(0, 0, 0)], (screen_width / 15, screen_height / 9))
 
 buttons = []
 # Clear Button
-clear_btn = Button.Button('img', ['clear.png'], (50, 50), 'Clear', False, 20, [(255, 255, 255)],
+clear_btn = Button.Button('img', ['Media/Images/clear.png'], (50, 50), 'Clear', False, 20, [(255, 255, 255)],
                           (0, 0))
 buttons.append(clear_btn)
 
 # Previous maze button
-prev_btn = Button.Button('img', ['start.png'], (50, 50), 'Prev', False, 20, [(255, 255, 255)],
+prev_btn = Button.Button('img', ['Media/Images/start.png'], (50, 50), 'Prev', False, 20, [(255, 255, 255)],
                          (0, 0))
 buttons.append(prev_btn)
 
 # New/Next Maze Button
-new_btn = Button.Button('img', ['play.png'], (50, 50), 'Next', False, 20, [(255, 255, 255)],
+new_btn = Button.Button('img', ['Media/Images/play.png'], (50, 50), 'Next', False, 20, [(255, 255, 255)],
                         (0, 0))
 buttons.append(new_btn)
 
 # Show/Hide Solution Button
-sol_btn = Button.Button('img', ['openeye.png', 'closedeye.png'], (50, 50), 'Show Solution', False, 20, [(255, 255, 255)],
+sol_btn = Button.Button('img', ['Media/Images/openeye.png', 'Media/Images/closedeye.png'], (50, 50), 'Show Solution', False, 20, [(255, 255, 255)],
                         (0, 0))
 buttons.append(sol_btn)
 

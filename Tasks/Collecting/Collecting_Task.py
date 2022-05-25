@@ -2,7 +2,7 @@ import numpy
 import pygame
 import random
 import time
-from General import GameParameters
+import GameParameters
 
 
 class Point:
@@ -45,7 +45,7 @@ firstOpen = True
 x = []
 y = []
 pygame.mixer.init()  # Initialize the mixer module
-sound1 = pygame.mixer.Sound('../../Media/SFX/success.mp3')  # Load a sound.
+sound1 = pygame.mixer.Sound('Media/SFX/success.mp3')  # Load a sound.
 working = True
 rect = pygame.draw.rect(screen, (255, 255, 255),
                         (x_size, y_size, x_length, y_length), 5)
@@ -170,18 +170,18 @@ def getCoords(xn, yn):
 # gSer.flush()
 
 
-startL = pygame.image.load('../../Media/Images/start_game.png').convert_alpha()
+startL = pygame.image.load('Media/Images/start_game.png').convert_alpha()
 startL = pygame.transform.scale(startL, (207, 64))
 rectStart = startL.get_rect()
 rectStart.center = (130, screen_height-52)
 
-background_image = pygame.image.load("../../Media/Backgrounds/grass2.jpg")
+background_image = pygame.image.load("Media/Backgrounds/grass2.jpg")
 
-sheep_image = pygame.image.load("../../Media/Images/sheep.png")
+sheep_image = pygame.image.load("Media/Images/sheep.png")
 sheep_image = pygame.transform.flip(sheep_image, True, False)
 sheep_image = pygame.transform.scale(sheep_image, (sheep_size, sheep_size))
 
-fence_image = pygame.image.load("../../Media/Images/fence2.png")
+fence_image = pygame.image.load("Media/Images/fence2.png")
 fence_image = pygame.transform.flip(fence_image, True, False)
 fence_image = pygame.transform.scale(fence_image, (469, 345))
 

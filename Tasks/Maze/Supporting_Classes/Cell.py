@@ -1,6 +1,5 @@
 import pygame
 import random
-import time
 
 
 # The Cell class handles cell creation

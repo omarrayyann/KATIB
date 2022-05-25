@@ -6,7 +6,7 @@ pygame.init()
 screen = pygame.display.set_mode((640, 480))
 COLOR_INACTIVE = (200, 200, 200)
 COLOR_ACTIVE = pygame.Color('black')
-FONT = pygame.font.Font('Futura-Medium.otf', 35)
+FONT = pygame.font.Font('Media/Fonts/Futura-Medium.otf', 35)
 
 
 class InputBox:
@@ -80,7 +80,7 @@ class InputBox:
             screen.blit(FONT.render('|', True, self.color), (self.rect.x + 20 + self.txt_surface.get_size()[0], self.rect.y + self.h/6 + 3))
         # Blit the rect.
         if self.get_text() == "":
-            font = pygame.font.Font('Futura-Medium.otf', 30)
+            font = pygame.font.Font('Media/Fonts/Futura-Medium.otf', 30)
             placeholder_text = FONT.render(self.place_holder_text, True, (150, 150, 150))
             placeholder_text_rect = placeholder_text.get_rect()
             placeholder_text_rect.center = self.rect.center

@@ -1,5 +1,5 @@
 import pygame
-import Cell
+from Tasks.Maze.Supporting_Classes import Cell
 import math
 import copy
 import datetime
