@@ -42,9 +42,7 @@ password_field = InputBox.InputBox(
 password_field_rect = pygame.Rect(
     password_field_x, password_field_y, password_field_width, password_field_height)
 password_field.secure = True
-box_list = [username_field, password_field]
-username_field.box_list = box_list
-password_field.box_list = box_list
+
 
 fields = [username_field, password_field]
 
