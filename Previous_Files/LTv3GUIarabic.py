@@ -100,7 +100,7 @@ lettersX = []
 lettersY = []
 
 cwd = os.getcwd()
-Data_path = cwd+"/Arabic/Data_converted"
+Data_path = "../Letters_Data/Arabic/Data_converted"
 letter_paths = os.listdir(Data_path)
 print(letter_paths)
 for file_name in letter_paths:

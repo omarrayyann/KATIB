@@ -19,6 +19,7 @@ current_point = 0
 show = True
 haptic_on = True
 on_katib = False
+copy_work = True
 
 if not nested:
     os.chdir('../../')
@@ -78,9 +79,9 @@ if not nested:
     (screen_width, screen_height) = pygame.display.get_surface().get_size()
     boundaries_x = 150
     boundaries_y = 150
+    x_length = screen_width - (boundaries_x * 2)
+    x_size = boundaries_x
     y_length = screen_height - (boundaries_y * 2)
-    x_length = y_length
-    x_size = (screen_width - x_length) / 2
     y_size = boundaries_y
 
 magnet_point = pygame.draw.circle(screen, (100, 0, 0), (0, 0), 30)
@@ -252,9 +253,6 @@ try:
 
 except StopIteration:
     pass
-if on_katib:
-    string2send = str(0.0) + '\n'
-    gSer.write(str.encode('M3 S100\n'))
-    gSer.write(str.encode('M3 S800\n'))
+
 if not nested:
     pygame.quit()

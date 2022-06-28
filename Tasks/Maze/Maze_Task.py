@@ -16,12 +16,12 @@ fpsClock = pygame.time.Clock()
 FPS = 100
 
 # Setting up game variables:
-nested = False
+nested = True
 volume = GameParameters.GameParameters.volume
 opacity = 255 - GameParameters.GameParameters.brightness
 show = False
 skip = False
-haptic_on = True
+haptic_on = False
 gSer = 0
 
 # Electromagnet Setup
@@ -36,48 +36,46 @@ if not nested:
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     os.chdir('../../')
     if on_katib:
-        if on_katib:
-            global gSer
-            gSer = serial.Serial('/dev/ttyACM0', '115200')
-            time.sleep(3)
-            gSer.flush()
-            gSer.flush()
-            print(gSer.readline())
-            print(gSer.readline())
-            time.sleep(1)
-            gSer.write(str.encode('$X\n'))
-            gSer.write(str.encode('M3 S100\n'))
-            gSer.write(str.encode('M3 S600\n'))
-            gSer.write(str.encode('$H\n'))
+        gSer = serial.Serial('/dev/ttyACM0', '115200')
+        time.sleep(3)
+        gSer.flush()
+        gSer.flush()
+        print(gSer.readline())
+        print(gSer.readline())
+        time.sleep(1)
+        gSer.write(str.encode('$X\n'))
+        gSer.write(str.encode('M3 S100\n'))
+        gSer.write(str.encode('M3 S600\n'))
+        gSer.write(str.encode('$H\n'))
 
-            time.sleep(5)
+        time.sleep(5)
 
-            gSer.write(str.encode('$X\n'))
-            gSer.write(str.encode('M3 S600\n'))
-            time.sleep(1)
-            gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
-            print(gSer.readline())
-            time.sleep(0.1)
-            gSer.write(str.encode('G21 X25  Y-10 F4000\n'))
-            print(gSer.readline())
-            time.sleep(0.1)
-            gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
-            print(gSer.readline())
-            time.sleep(2)
-            gSer.write(str.encode('$X\n'))
-            print(gSer.readline())
-            gSer.write(str.encode('M3 S1000\n'))
-            print(gSer.readline())
-            gSer.write(str.encode(' G21 X0 Y-154 F4000\n'))
-            print(gSer.readline())
-            gSer.write(str.encode('$X\n'))
-            gSer.write(str.encode(' G21 X250 Y-154 F4000\n'))
-            print(gSer.readline())
-            gSer.write(str.encode('$X\n'))
-            gSer.write(str.encode(' G21 X0 Y0 F4000\n'))
-            print(gSer.readline())
-            gSer.write(str.encode('$X\n'))
-            gSer.write(str.encode('M3 S1000\n'))
+        gSer.write(str.encode('$X\n'))
+        gSer.write(str.encode('M3 S600\n'))
+        time.sleep(1)
+        gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
+        print(gSer.readline())
+        time.sleep(0.1)
+        gSer.write(str.encode('G21 X25  Y-10 F4000\n'))
+        print(gSer.readline())
+        time.sleep(0.1)
+        gSer.write(str.encode('G10 P1 L20 X0 Y0\n'))
+        print(gSer.readline())
+        time.sleep(2)
+        gSer.write(str.encode('$X\n'))
+        print(gSer.readline())
+        gSer.write(str.encode('M3 S1000\n'))
+        print(gSer.readline())
+        gSer.write(str.encode(' G21 X0 Y-154 F4000\n'))
+        print(gSer.readline())
+        gSer.write(str.encode('$X\n'))
+        gSer.write(str.encode(' G21 X250 Y-154 F4000\n'))
+        print(gSer.readline())
+        gSer.write(str.encode('$X\n'))
+        gSer.write(str.encode(' G21 X0 Y0 F4000\n'))
+        print(gSer.readline())
+        gSer.write(str.encode('$X\n'))
+        gSer.write(str.encode('M3 S1000\n'))
 (screen_width, screen_height) = pygame.display.get_surface().get_size()
 boundaries_x = 150
 boundaries_y = 150
@@ -161,6 +159,7 @@ def inv_kin(x_in, y_in):
 
 
 def getCoords(xn, yn):
+    global x_length, x_size, y_size, y_length
     print(" xN: ", xn, " yN: ", yn)
     if xn < x_size +x_length and xn >= x_size:
         xn = (xn-x_size)/x_length
