@@ -100,7 +100,7 @@ lettersX = []
 lettersY = []
 
 cwd = os.getcwd()
-Data_path = cwd+"/Letters_Data/Arabic/Data_converted"
+Data_path = cwd+"/Letters_Data/Arabic/Data_KMCP_Equidistant"
 letter_paths = os.listdir(Data_path)
 # print(letter_paths)
 for file_name in letter_paths:
@@ -248,7 +248,7 @@ try:
                     current_point = 0
                 elif buttons[3].rect.collidepoint(e.pos):
                     show = not show
-        draw_magnet()
+        # draw_magnet()
 
 except StopIteration:
     pass
