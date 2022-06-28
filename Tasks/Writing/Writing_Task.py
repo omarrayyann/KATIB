@@ -19,6 +19,7 @@ current_point = 0
 show = True
 haptic_on = True
 on_katib = False
+originalPoints = []
 
 if not nested:
     os.chdir('../../')
@@ -83,6 +84,24 @@ if not nested:
     x_size = (screen_width - x_length) / 2
     y_size = boundaries_y
 
+cwd = os.getcwd()
+Data_path = os.getcwd() + "/Letters_Data/Arabic/Data_converted/"
+letter_paths = os.listdir(Data_path)
+
+for file_name in letter_paths:
+
+    with open(Data_path + '' + file_name, 'r') as csvfile:
+        coords = csv.reader(csvfile, delimiter=' ')
+        POINTS = []
+        x = []
+        y = []
+        for row in coords:
+            if len(row) > 1:
+                x.append(int(x_size + 50 + (0.7 * x_length) * (float(row[0]))))
+                y.append(int(y_size + 50 + (0.8 * y_length) * (float(row[1]))))
+                POINTS.append((x[len(x) - 1], y[len(y) - 1]))
+    originalPoints.append(POINTS)
+
 magnet_point = pygame.draw.circle(screen, (100, 0, 0), (0, 0), 30)
 pygame.display.set_caption('Writing Serious Game')
 bg_color = (0, 0, 0)
@@ -92,7 +111,7 @@ draw_area = DrawArea.DrawArea(x_length, y_length, start_pos, canvas_color)
 
 delim = ' '
 imageDir = 'Letters_Data/Arabic/Image'
-letterDir = 'Letters_Data/Arabic/Data/'
+# letterDir = 'Letters_Data/Arabic/Data/'
 
 d = dict.fromkeys(string.ascii_lowercase, [])
 letterImg = []
@@ -182,7 +201,13 @@ def getCoords(xn, yn):
 def draw_solution(current_task):
     global lettersY, lettersX
     for i in range(len(lettersX[current_task])):
-        pygame.draw.circle(screen, (100, 100, 100), (lettersX[current_task][i], lettersY[current_task][i]), 10)
+        pygame.draw.circle(screen, (100, 100, 100), (lettersX[current_task][i], lettersY[current_task][i]), 5)
+
+
+def draw_original(current_task):
+    global originalPoints
+    for point in originalPoints[current_task]:
+        pygame.draw.circle(screen, (0, 255, 0), point, 20)
 
 
 def apply_brightness():
@@ -207,6 +232,7 @@ try:
         prev_menu_btn.draw_button(screen)
         draw_area.draw_canvas(screen)
         if show:
+            draw_original(current_task)
             draw_solution(current_task)
         draw_area.draw_data(screen, (200, 0, 0), 10, )
         apply_brightness()

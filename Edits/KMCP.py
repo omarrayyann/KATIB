@@ -15,7 +15,6 @@ screen.fill((255, 255, 255))
 cwd = os.getcwd()
 Data_path = "../Letters_Data/Arabic/Data_Equidistant/"
 new_data_path = "../Letters_Data/Arabic/Data_Equidistant_KMCP/"
-print("something nothing in particular")
 running = True
 fetched = False
 smoothened = False
@@ -25,6 +24,7 @@ points = []
 raw_points = []
 smooth_points = []
 new_smooth_points = []
+newPoints = []
 angles = []
 KMCP = []
 letter_paths = os.listdir(Data_path)
@@ -40,8 +40,8 @@ for file_name in letter_paths:
         y = []
         for row in coords:
             if len(row) > 1:
-                x.append((int(0 + 50 + (0.8 * 800) * (float(row[0])))))
-                y.append((int(0 + 50 + (0.8 * 800) * (float(row[1])))))
+                x.append(800 * (float(row[0])))
+                y.append(800 * (float(row[1])))
                 POINTS.append((x[len(x) - 1], y[len(y) - 1]))
     lettersX.append(x)
     lettersY.append(y)
@@ -135,10 +135,11 @@ def B_spline(waypoints):
     smooth = interpolate.splev(u, tck)
     x_smooth, y_smooth = smooth
     strings = []
+    newPoints = []
     for (x, y) in zip(x_smooth, y_smooth):
-        strings.append(
-            str(x / int(0 + 50 + (0.8 * 800))) + " " + str(y / int(0 + 50 + (0.8 * 800))))
-    return strings
+        strings.append(str(x / 800) + " " + str(y / 800))
+        newPoints.append((x, y))
+    return strings, newPoints
     #         for (x, y) in zip(x_smooth, y_smooth):
     #             smooth.append((x, y))
 
@@ -191,17 +192,19 @@ while running:
         i = 0
         for file_name in letter_paths:
             KMCP = fill_V(points[i])
-            newPoints = B_spline(KMCP)
+            strings, new = B_spline(KMCP)
+            newPoints.append(new)
             with open(new_data_path + '' + file_name, 'w') as csvfile:
                 writer = csv.writer(csvfile)
-                writer.writerows([c.strip() for c in r.strip(', ').split(',')] for r in newPoints)
+                writer.writerows([c.strip() for c in r.strip(', ').split(',')] for r in strings)
             print('step')
             i += 1
         smoothened = True
         print('done')
-
-    # for i in range(len(newPoints)):
-    #     pygame.draw.circle(screen, (0, 0, 255), newPoints[i], 10)
+    for i in range(len(points[1])):
+        pygame.draw.circle(screen, (255, 0, 0), points[1][i], 10)
+    for i in range(len(newPoints[1])):
+        pygame.draw.circle(screen, (0, 0, 255), newPoints[1][i], 5)
 
     pygame.display.flip()
 
