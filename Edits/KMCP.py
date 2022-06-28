@@ -15,6 +15,7 @@ screen.fill((255, 255, 255))
 cwd = os.getcwd()
 Data_path = "../Letters_Data/Arabic/Data_Equidistant/"
 new_data_path = "../Letters_Data/Arabic/Data_Equidistant_KMCP/"
+print("something nothing in particular")
 running = True
 fetched = False
 smoothened = False
